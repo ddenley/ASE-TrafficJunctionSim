@@ -6,12 +6,11 @@ import java.util.Queue;
 public class Phase {
 	
 	private float phaseDuration;
-	private String phaseName;
 	private Queue<String> vehicleKeysQueue = new LinkedList<String>();
 	
-	public Phase(String phaseName, float phaseDuration) {
-		this.phaseName = phaseName;
-		this.phaseDuration = phaseDuration;
+	public Phase(String phaseDuration) {
+		float float_duration = Float.valueOf(phaseDuration);
+		this.phaseDuration = float_duration;
 	}
 	
 	//Queue methods
@@ -26,10 +25,6 @@ public class Phase {
 	//Getters
 	public float getPhaseDuration() {
 		return this.phaseDuration;
-	}
-	
-	public String getPhaseName() {
-		return this.phaseName;
 	}
 	
 	public Queue<String> getVehicleKeysQueue(){

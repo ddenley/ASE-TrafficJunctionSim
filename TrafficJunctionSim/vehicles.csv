@@ -1,13 +1,13 @@
 Vehicle, Type, Crossing Time, Direction, Length, Emission, Status, Segment
-L23467,Car,10,Left,5,12,Waiting,S1
+L23467,Car,10,Straight,5,12,Waiting,S1
 B24F67,Bus,6,Right,12,7,Waiting,S3
 GG3427,Bus,22,Straight,14,9,Waiting,S4
 FFFT34,Car,10,Left,5,12,Waiting,S1
 HG7861,Bus,6,Right,12,7,Waiting,S3
 GG7427,Bus,22,Straight,14,9,Waiting,S4
-J28887,Car,10,Left,5,12,Waiting,S1
+J28887,Car,10,Right,5,12,Waiting,S1
 KK4F67,Bus,6,Right,12,7,Waiting,S3
-NJK427,Bus,22,Straight,14,9,Waiting,S4
+NJK427,Bus,22,Left,14,9,Waiting,S4
 L29997,Car,10,Left,5,12,Waiting,S1
 B10167,Bus,6,Right,12,7,Waiting,S3
 GJKL27,Bus,22,Straight,14,9,Waiting,S4
@@ -20,6 +20,6 @@ ASDFGH,Bus,22,Straight,14,9,Waiting,S4
 8976HH,Car,10,Left,5,12,Waiting,S1
 PPPOI9,Bus,6,Right,12,7,Waiting,S3
 MKMK09,Bus,22,Straight,14,9,Waiting,S4
-MMNMN0,Car,10,Left,5,12,Waiting,S1
+MMNMN0,Car,10,Straight,5,12,Waiting,S1
 BVBV76,Bus,6,Right,12,7,Waiting,S3
 POIL99,Bus,22,Straight,14,9,Waiting,S4
