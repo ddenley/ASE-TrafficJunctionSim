@@ -2,27 +2,35 @@ package JunctionSim;
 
 import java.util.HashMap;
 
+import java.util.ArrayList;
+
 public class Vehicles {
 	
 	private HashMap<String, Vehicle> vehiclesHMap = new HashMap<String, Vehicle>();
 	private String[] vehicleHeaders;
 	
 	public Vehicles(){
-		//Set vehicles header
-		this.setCSVHeader();
-		//Populate hash map of vehicles
-		this.populateFromCSV();
+		Object[] header_values = ReadCSV.getHeaderValues("vehicles.csv");
+		String[] header = (String[]) header_values[0];
+		ArrayList<String[]> values = (ArrayList<String[]>) header_values[1];
+		setCSVHeader(header);
+		populateFromCSV(values);
 	}
 	
-	private void setCSVHeader() {
-		
+	private void setCSVHeader(String[] header) {
+		this.vehicleHeaders = header;
 	}
 	
-	private void populateFromCSV() {
-		
+	private void populateFromCSV(ArrayList<String[]> values) {
+		for (String[] vehicleParams : values) {
+			//Build a vehicle object using the file parameters
+			Vehicle vehicle = buildVehicle(vehicleParams);
+			//Insert the vehicle into the hash map
+			insertVehicle(vehicle);
+		}
 	}
 	
-	private void buildVehicle(String vehicleParams[]) {
+	private Vehicle buildVehicle(String vehicleParams[]) {
 		//Decided to handle parsings from strings in vehicles constructor
 		Vehicle vehicle = new Vehicle(
 				vehicleParams[0], //vehicleID
@@ -34,6 +42,7 @@ public class Vehicles {
 				vehicleParams[6], //status
 				vehicleParams[7] //segment
 				);
+		return vehicle;
 	}
 	
 	// Insert a vehicle into the HMAP - and phase queue??

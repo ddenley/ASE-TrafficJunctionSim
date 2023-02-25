@@ -23,7 +23,7 @@ public class GUI extends JFrame implements ActionListener {
 	private GUI(){
 		//Initialisation of required classes
 		this.vehicles = new Vehicles();
-		this.phases = new Phases();
+		//this.phases = new Phases();
 	}
 
 	@Override
