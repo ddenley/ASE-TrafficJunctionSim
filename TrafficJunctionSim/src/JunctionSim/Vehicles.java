@@ -26,7 +26,7 @@ public class Vehicles {
 			//Build a vehicle object using the file parameters
 			Vehicle vehicle = buildVehicle(vehicleParams);
 			//Insert the vehicle into the hash map
-			insertVehicle(vehicle);
+			insertVehicleHashMap(vehicle);
 		}
 	}
 	
@@ -45,8 +45,8 @@ public class Vehicles {
 		return vehicle;
 	}
 	
-	// Insert a vehicle into the HMAP - and phase queue??
-	private void insertVehicle(Vehicle v) {
+
+	private void insertVehicleHashMap(Vehicle v) {
 		this.vehiclesHMap.putIfAbsent(v.getVehicleID(), v);
 	}
 	
@@ -78,6 +78,7 @@ public class Vehicles {
 	public String[] getVehicleHeaders() {
 		return this.vehicleHeaders;
 	}
+	
 	
 	//TODO: Method for statistics from HMAP
 	//TODO: Sorting methods?

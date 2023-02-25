@@ -58,6 +58,13 @@ public class Phases {
         }
 	}
 	
+	public void insertVehicleQueue(Vehicle v) {
+		String phase_key = v.getEightPhaseAllocation();
+		String vehicle_key = v.getVehicleID();
+		Phase phase = this.phasesHMap.get(phase_key);
+		phase.addQueue(vehicle_key);
+	}
+	
 	public void quickPhaseQueueCheck() {
 		for (Phase phase : this.phasesHMap.values()) {
 			System.out.println(phase.getVehicleKeysQueue());
