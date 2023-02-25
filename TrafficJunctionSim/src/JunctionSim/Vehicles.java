@@ -2,8 +2,6 @@ package JunctionSim;
 
 import java.util.HashMap;
 
-import JunctionSim.Vehicle;
-
 public class Vehicles {
 	
 	private HashMap<String, Vehicle> vehiclesHMap = new HashMap<String, Vehicle>();
