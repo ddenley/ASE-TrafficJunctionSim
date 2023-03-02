@@ -54,6 +54,16 @@ public class roadIntersectionGUI extends javax.swing.JFrame {
        jTable6.getTableHeader().setForeground(new Color(20,20,245));
         jTable6.setRowHeight(30);
         
+        TableRowSorter<TableModel> mysorter = new TableRowSorter<>(jTable5.getModel());//  an instancee of table 5 model
+        List<RowSorter.SortKey> sortKeys = new ArrayList<>();// the list is created with objects
+        //column and pathern to be sorted
+        sortKeys.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
+        sortKeys.add(new RowSorter.SortKey(3, SortOrder.ASCENDING));
+        sortKeys.add(new RowSorter.SortKey(6, SortOrder.ASCENDING));
+        sortKeys.add(new RowSorter.SortKey(7, SortOrder.ASCENDING)); 
+        mysorter.setSortKeys(sortKeys);
+        jTable5.setRowSorter(mysorter);
+        
     }
 
     private Color Color(int i, int i0, int i1) {
