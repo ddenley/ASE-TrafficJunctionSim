@@ -65,6 +65,40 @@ public class Phases {
 		phase.addQueue(vehicle_key);
 	}
 	
+	public String[] getPhaseHeaders() {
+		return this.phaseHeaders;
+	}
+	
+	public Object[][] getPhases2DObjectArray(){
+		Object[][] phaseArray = new Object[phasesHMap.size()][2];
+		int index = 0;
+		for (Map.Entry<String, Phase> entry : phasesHMap.entrySet()) {
+		    String key = entry.getKey();
+		    Phase phase = entry.getValue();
+		    phaseArray[index][0] = key;
+		    phaseArray[index][1] = phase.getPhaseDuration();
+		    index++;
+		}
+		return phaseArray;
+	}
+	
+	public Object[][] getPhasesVehicles2DObjectArray(){
+		Object[][] phaseVehiclesArray = new Object[vehicles.getVehiclesHashMap().size()][2];
+		int index = 0;
+		//Iterate over phases HMAP
+		for (Map.Entry<String, Phase> entry : phasesHMap.entrySet()) {
+			//Iterate over the vehicle keys within each phase queue
+			Phase phase = entry.getValue();
+			String phaseName = entry.getKey();
+			for(String vehicleID : phase.getVehicleKeysQueue()) {
+				phaseVehiclesArray[index][0] = phaseName;
+				phaseVehiclesArray[index][1] = vehicleID;
+				index++;
+			}
+		}
+		return phaseVehiclesArray;
+	}
+	
 	public void quickPhaseQueueCheck() {
 		for (Phase phase : this.phasesHMap.values()) {
 			System.out.println(phase.getVehicleKeysQueue());

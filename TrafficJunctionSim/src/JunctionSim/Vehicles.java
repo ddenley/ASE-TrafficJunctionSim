@@ -79,7 +79,70 @@ public class Vehicles {
 		return this.vehicleHeaders;
 	}
 	
+	//Returns the total CO2 of all vehicles in a waiting state as a string
+	public String getTotalCO2() {
+		float co2 = 0;
+		for (Vehicle v : vehiclesHMap.values()) {
+			if(v.getStatus().equals("Waiting")) {
+				//Grams of C02 per minute
+				co2 += v.getEmissionRate();
+			}
+		}
+		//Convert to kg
+		float co2_kg = co2 / 1000;
+		//Covert to string for GUI
+		String co2_string = String.format("%d",(long)co2) + " Grams";
+		return co2_string;
+	}
 	
-	//TODO: Method for statistics from HMAP
+	
+	public Object[][] getSegmentStatistics() {
+		Object[][] segmentStatsArray = new Object[4][5];
+		//Set segment names for segmentStatsArray
+		segmentStatsArray[0][0] = "S1";
+		segmentStatsArray[1][0] = "S2";
+		segmentStatsArray[2][0] = "S3";
+		segmentStatsArray[3][0] = "S4";
+		//Init statistic values
+		int i = 0;
+		while(i <= 3) {
+			segmentStatsArray[i][1] = 0f;
+			segmentStatsArray[i][2] = 0f;
+			segmentStatsArray[i][3] = 0f;
+			segmentStatsArray[i][4] = 0;
+			i++;
+		}
+		int index = -1;
+		for (Vehicle vehicle : vehiclesHMap.values()) {
+			//Calculate index to update values within
+			if(vehicle.getSegment().equals("S1")) {
+				index = 0;
+			}
+			else if(vehicle.getSegment().equals("S2")) {
+				index = 1;
+			}
+			else if(vehicle.getSegment().equals("S3")) {
+				index = 2;
+			}
+			else if(vehicle.getSegment().equals("S4")) {
+				index = 3;
+			}
+			//Update total waiting time
+			segmentStatsArray[index][1] = ((float)segmentStatsArray[index][1]) + vehicle.getCrossingTime();
+			//Update total length
+			segmentStatsArray[index][2] = ((float)segmentStatsArray[index][2]) + vehicle.getLength();
+			//Update total crossing time - average after
+			segmentStatsArray[index][3] = ((float)segmentStatsArray[index][3]) + vehicle.getCrossingTime();
+			//Update number of vehicles
+			segmentStatsArray[index][4] = ((int)segmentStatsArray[index][4]) + 1;
+		}
+		//Now average the cross times
+		i = 0;
+		while(i <= 3) {
+			segmentStatsArray[i][3] = ((float)segmentStatsArray[i][3]) / ((int)segmentStatsArray[i][4]);
+			i++;
+		}
+		return segmentStatsArray;
+	}
 	//TODO: Sorting methods?
 }

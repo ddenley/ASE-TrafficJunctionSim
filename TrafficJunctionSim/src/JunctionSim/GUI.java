@@ -70,7 +70,7 @@ public class GUI extends JFrame implements ActionListener {
 		
 	}
 	
-	public static void main(String[] args) {
+	public static void main_old(String[] args) {
 		//Ran before constructor
 		GUI gui = new GUI();
 	}
