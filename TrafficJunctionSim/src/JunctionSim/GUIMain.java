@@ -18,6 +18,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import javax.swing.JButton;
 
 public class GUIMain extends JFrame implements ActionListener{
@@ -31,6 +32,8 @@ public class GUIMain extends JFrame implements ActionListener{
 	private JTable tablePhaseAllocation;
 	private JTable tableStatistics;
 	private JTable tableAddVehicle;
+	
+	private JLabel lblCO2;
 
 	/**
 	 * Launch the application.
@@ -113,8 +116,8 @@ public class GUIMain extends JFrame implements ActionListener{
 		//Get content for phase allocation table
 		Object[][] phaseAllocationContent = this.phases.getPhasesVehicles2DObjectArray();
 		//***************************FOR SOME REASON THIS NEEDS CHANGED OR DESIGNER WILL NOT WORK ON ECLIPSE*******************************************
-		//tablePhaseAllocation = new JTable(phaseAllocationContent, phaseAllocationHeader);
-		tablePhaseAllocation = new JTable();
+		tablePhaseAllocation = new JTable(phaseAllocationContent, phaseAllocationHeader);
+		//tablePhaseAllocation = new JTable();
 		tablePhaseAllocation.setFillsViewportHeight(true);
 		scrollPanePhaseAllocation.setViewportView(tablePhaseAllocation);
 		
@@ -130,8 +133,8 @@ public class GUIMain extends JFrame implements ActionListener{
 		String[] statisticsHeader = {"Segment", "Waiting Time", "Total Length", "Avg Cross Time", "Number of Vehicles"};
 		//Get content for statistics table
 		Object[][] statisticsContent = this.vehicles.getSegmentStatistics();
-		//tableStatistics = new JTable(statisticsContent, statisticsHeader);
-		tableStatistics = new JTable();
+		tableStatistics = new JTable(statisticsContent, statisticsHeader);
+		//tableStatistics = new JTable();
 		tableStatistics.setFillsViewportHeight(true);
 		scrollPaneStatistics.setViewportView(tableStatistics);
 		
@@ -161,7 +164,14 @@ public class GUIMain extends JFrame implements ActionListener{
 			new String[] {
 				"Vehicle ID", "Type", "Crossing Time", "Direction", "Length", "Emission", "Status", "Segment"
 			}
-		));
+		) {
+			Class[] columnTypes = new Class[] {
+				String.class, Object.class, String.class, String.class, String.class, String.class, String.class, String.class
+			};
+			public Class getColumnClass(int columnIndex) {
+				return columnTypes[columnIndex];
+			}
+		});
 		tableAddVehicle.setRowHeight(30);
 		scrollPaneAddVehicle.setViewportView(tableAddVehicle);
 		
@@ -183,7 +193,7 @@ public class GUIMain extends JFrame implements ActionListener{
 		btnExit.addActionListener(this);
 		btnExit.setActionCommand("Exit");
 		
-		JLabel lblCO2 = new JLabel("C02: " + this.vehicles.getTotalCO2());
+		lblCO2 = new JLabel("C02: " + this.vehicles.getTotalCO2());
 		lblCO2.setBounds(10, 430, 139, 14);
 		contentPane.add(lblCO2);
 		
@@ -202,6 +212,7 @@ public class GUIMain extends JFrame implements ActionListener{
 		String action = e.getActionCommand();
 		if (action.equals("Add Vehicle")) {
 			System.out.println("Adding Vehicle");
+			addVehicle();
 		}
 		if (action.equals("Clear Input")) {
 			System.out.println("Clearing Input");
@@ -224,9 +235,49 @@ public class GUIMain extends JFrame implements ActionListener{
 		String[] vehicleParams = new String[8];
 		int i = 0;
 		while(i <= 7) {
-			vehicleParams[i] = null;
+			vehicleParams[i] = (String)this.tableAddVehicle.getValueAt(0,i);
 			i++;
 		}
-		this.tableAddVehicle.getValueAt(0,0);
+		
+		//Build vehicle from input params
+		Vehicle vehicle = this.vehicles.buildVehicle(vehicleParams);
+		
+		//Add vehicle to hash map
+		this.vehicles.insertVehicleHashMap(vehicle);
+		
+		//Add vehicle to queue
+		this.phases.insertVehicleQueue(vehicle);
+		
+		//Refresh GUI values
+		refreshGUIValues();
+	}
+	
+	private void refreshGUIValues() {
+		//Refresh tables - Vehicle table
+		// Get header for vehicles table
+		String[] vehiclesHeader = this.vehicles.getVehicleHeaders();
+		// Get content for vehicles table
+		Object[][] vehiclesContents = this.vehicles.getVehicles2DArray();
+		TableModel vehiclesTableModel = new DefaultTableModel(vehiclesContents, vehiclesHeader);
+		this.tableVehicles.setModel(vehiclesTableModel);
+				
+		//Refresh tables - Vehicles Phase Allocation Table
+		//Get header for phase allocation table
+		String[] phaseAllocationHeader = {"Phase", "Vehicle"};
+		//Get content for phase allocation table
+		Object[][] phaseAllocationContent = this.phases.getPhasesVehicles2DObjectArray();
+		TableModel phaseAllocationTableModel = new DefaultTableModel(phaseAllocationContent, phaseAllocationHeader);
+		this.tablePhaseAllocation.setModel(phaseAllocationTableModel);
+				
+		//Refresh tables - Statistic Table
+		//Get header for statistics table
+		String[] statisticsHeader = {"Segment", "Waiting Time", "Total Length", "Avg Cross Time", "Number of Vehicles"};
+		//Get content for statistics table
+		Object[][] statisticsContent = this.vehicles.getSegmentStatistics();
+		TableModel statisticsTableModel = new DefaultTableModel(statisticsContent, statisticsHeader);
+		this.tableStatistics.setModel(statisticsTableModel);
+		
+		//Update CO2 statistic label
+		this.lblCO2.setText("C02: " + this.vehicles.getTotalCO2());
 	}
 }

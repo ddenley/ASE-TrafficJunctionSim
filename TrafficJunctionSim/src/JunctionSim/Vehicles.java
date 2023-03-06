@@ -30,7 +30,7 @@ public class Vehicles {
 		}
 	}
 	
-	private Vehicle buildVehicle(String vehicleParams[]) {
+	public Vehicle buildVehicle(String vehicleParams[]) {
 		//Decided to handle parsings from strings in vehicles constructor
 		Vehicle vehicle = new Vehicle(
 				vehicleParams[0], //vehicleID
@@ -46,7 +46,7 @@ public class Vehicles {
 	}
 	
 
-	private void insertVehicleHashMap(Vehicle v) {
+	public void insertVehicleHashMap(Vehicle v) {
 		this.vehiclesHMap.putIfAbsent(v.getVehicleID(), v);
 	}
 	
