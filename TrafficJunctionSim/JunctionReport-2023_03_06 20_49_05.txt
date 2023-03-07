@@ -1,4 +1,0 @@
-Traffic Junction Simulator Report || Dated: 2023/03/06 20:49:05
-Statistics Per Phase:
-This is line 1 stats
-This is line 2 stats
