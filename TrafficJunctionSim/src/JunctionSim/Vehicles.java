@@ -24,29 +24,48 @@ public class Vehicles {
 	private void populateFromCSV(ArrayList<String[]> values) {
 		for (String[] vehicleParams : values) {
 			//Build a vehicle object using the file parameters
-			Vehicle vehicle = buildVehicle(vehicleParams);
-			//Insert the vehicle into the hash map
-			insertVehicleHashMap(vehicle);
+			try {
+				Vehicle vehicle = buildVehicle(vehicleParams);
+				
+				//Insert the vehicle into the hash map
+				try {
+					insertVehicleHashMap(vehicle);
+				}
+				catch(DuplicateVehicleIDException e) {
+					System.out.println("Duplicate key in csv file: ignoring");
+				}
+			}
+			catch(IllegalArgumentException ae) {
+				System.out.println("Invalid vehicle params in csv file: ignoring");
+			}
 		}
 	}
 	
 	public Vehicle buildVehicle(String vehicleParams[]) {
 		//Decided to handle parsings from strings in vehicles constructor
-		Vehicle vehicle = new Vehicle(
-				vehicleParams[0], //vehicleID
-				vehicleParams[1], //type
-				vehicleParams[2], //crossingTime
-				vehicleParams[3], //direction
-				vehicleParams[4], //length
-				vehicleParams[5], //emissionRate
-				vehicleParams[6], //status
-				vehicleParams[7] //segment
-				);
-		return vehicle;
+		try {
+			Vehicle vehicle = new Vehicle(
+					vehicleParams[0], //vehicleID
+					vehicleParams[1], //type
+					vehicleParams[2], //crossingTime
+					vehicleParams[3], //direction
+					vehicleParams[4], //length
+					vehicleParams[5], //emissionRate
+					vehicleParams[6], //status
+					vehicleParams[7] //segment
+					);
+			return vehicle;
+		}
+		catch(IllegalArgumentException ea) {
+			throw ea;
+		}
 	}
 	
 
-	public void insertVehicleHashMap(Vehicle v) {
+	public void insertVehicleHashMap(Vehicle v) throws DuplicateVehicleIDException{
+		if(this.vehiclesHMap.containsKey(v.getVehicleID())) {
+			throw new DuplicateVehicleIDException(v.getVehicleID());
+		}
 		this.vehiclesHMap.putIfAbsent(v.getVehicleID(), v);
 	}
 	
@@ -81,20 +100,25 @@ public class Vehicles {
 	
 	//Returns the total CO2 of all vehicles in a waiting state as a string
 	public String getTotalCO2() {
-		float co2 = 0;
-		for (Vehicle v : vehiclesHMap.values()) {
-			if(v.getStatus().equals("Waiting")) {
-				//Grams of C02 per minute
-				co2 += v.getEmissionRate();
+		//Sum the total crossing time of all vehicles waiting
+		float crossingTimeSum = 0;
+		//Get the average emission rate of all vehicles waiting
+		float emissionRateSum = 0;
+		int waitingCount = 0;
+		//Multiple to get a final CO2 emission of all waiting vehicles
+		for(Vehicle vehicle : vehiclesHMap.values()) {
+			if(vehicle.getStatus().equals("Waiting")) {
+				crossingTimeSum += vehicle.getCrossingTime();
+				emissionRateSum += vehicle.getEmissionRate();
+				waitingCount += 1;
 			}
 		}
+		float averageEmissionRate = emissionRateSum / waitingCount;
+		float waitingCO2 = averageEmissionRate * crossingTimeSum;
 		//Convert to kg
-		float co2_kg = co2 / 1000;
-		//Covert to string for GUI
-		String co2_string = String.format("%d",(long)co2) + " Grams";
-		return co2_string;
+		waitingCO2 = waitingCO2 / 1000;
+		return String.format("%.2f", waitingCO2) + " KG";
 	}
-	
 	
 	public Object[][] getSegmentStatistics() {
 		Object[][] segmentStatsArray = new Object[4][5];
@@ -143,6 +167,54 @@ public class Vehicles {
 			i++;
 		}
 		return segmentStatsArray;
+	}
+	
+	public int[] getVehiclesCrossedCounts() {
+		int[] segmentCrossedCounts = new int[4];
+		segmentCrossedCounts[0] = 0;
+		segmentCrossedCounts[1] = 0;
+		segmentCrossedCounts[2] = 0;
+		segmentCrossedCounts[3] = 0;
+		for(Vehicle vehicle : vehiclesHMap.values()) {
+			if(vehicle.getSegment().equals("S1") && vehicle.getStatus().equals("Crossed")) {
+				segmentCrossedCounts[0] += 1;
+			}
+			else if(vehicle.getSegment().equals("S2") && vehicle.getStatus().equals("Crossed")) {
+				segmentCrossedCounts[1] += 1;
+			}
+			else if(vehicle.getSegment().equals("S3") && vehicle.getStatus().equals("Crossed")) {
+				segmentCrossedCounts[2] += 1;
+			}
+			else if(vehicle.getSegment().equals("S4") && vehicle.getStatus().equals("Crossed")) {
+				segmentCrossedCounts[3] += 1;
+			}
+		}
+		return segmentCrossedCounts;
+	}
+	
+	//Require knowledge of phases for phase durations
+	public float waitingTimeOfVehicle(Vehicle vehicle, Phases phases) {
+		//Get number of cycles that passed before this vehicle crossed
+		int cyclesBeforeCross = vehicle.getCyclesBeforeCross();
+		//Get how many vehicles passed before this one in its phase for that cycle
+		int vehicleTurn = vehicle.getPhaseVehicleTurn();
+		//Get cycle time
+		float cycleTime = phases.getCycleTime();
+		//Multiply cycle time by cycles that occurred before this vehicles cycle
+		float cycleWaitingTime = cycleTime * cyclesBeforeCross;
+		//For every vehicle that crossed in this vehicles crossing cycle in its segment
+		//That crossed before this one
+		//Sum these times
+		float phaseWaitingTime = 0;
+		for(Vehicle v : vehiclesHMap.values()) {
+			if(v.getStatus().equals("Crossed") && v.getCyclesBeforeCross() == cyclesBeforeCross) {
+				if(v.getPhaseVehicleTurn() < vehicleTurn) {
+					phaseWaitingTime += v.getCrossingTime();
+				}
+			}
+		}
+		//Return sum of the cycle waiting time and phase waiting time
+		return phaseWaitingTime + cycleWaitingTime;
 	}
 	//TODO: Sorting methods?
 }

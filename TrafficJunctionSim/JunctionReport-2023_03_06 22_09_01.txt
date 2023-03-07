@@ -1,0 +1,6 @@
+Traffic Junction Simulator Report || Dated: 2023/03/06 22:09:01
+Statistics Per Phase:
+S1:-	Vehicles Crossed:0
+S2:-	Vehicles Crossed:0
+S3:-	Vehicles Crossed:0
+S4:-	Vehicles Crossed:0

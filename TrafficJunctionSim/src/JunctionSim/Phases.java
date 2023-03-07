@@ -11,6 +11,9 @@ public class Phases {
 	private String[] phaseHeaders;
 	private Vehicles vehicles;
 	
+	//This variable holds a counter of how many cycles have occurred
+	private int cyclesOccured;
+	
 	public Phases(Vehicles vehicles) {
 		this.vehicles = vehicles;
 		//ReadCSV.getHeaderValues("vehicles.csv");
@@ -99,9 +102,59 @@ public class Phases {
 		return phaseVehiclesArray;
 	}
 	
+	//This method was just to visualise how vehicles were populated into the queues - leaving for future debugging
 	public void quickPhaseQueueCheck() {
 		for (Phase phase : this.phasesHMap.values()) {
-			System.out.println(phase.getVehicleKeysQueue());
+			//System.out.println(phase.getVehicleKeysQueue());
 		}
+	}
+	
+	private float[] getPhaseDurations() {
+		float[] phaseDurations = new float[phasesHMap.size()];
+		int i = 0;
+		for (Phase phase : this.phasesHMap.values()) {
+			phaseDurations[i] = phase.getPhaseDuration();
+			i++;
+		}
+		return phaseDurations;
+	}
+	
+	public float getCycleTime() {
+		//Get the cumulative time of a cycle
+		float cycleTime = 0;
+		for(float phaseTime: getPhaseDurations()) {
+			cycleTime += phaseTime;
+		}
+		return cycleTime;
+	}
+	
+	public float[] getAverageSegmentWaitingTimes() {
+		float[] segmentWaitTimes = new float[4];
+		int[] vehiclesCrossedCounts = this.vehicles.getVehiclesCrossedCounts();
+		segmentWaitTimes[0] = 0;
+		segmentWaitTimes[1] = 0;
+		segmentWaitTimes[2] = 0;
+		segmentWaitTimes[3] = 0;
+		for(Vehicle vehicle: this.vehicles.getVehiclesHashMap().values()) {
+			if(vehicle.getStatus().equals("Crossed")) {
+				if(vehicle.getSegment().equals("S1")) {
+					segmentWaitTimes[0] += this.vehicles.waitingTimeOfVehicle(vehicle, this);
+				}
+				if(vehicle.getSegment().equals("S2")) {
+					segmentWaitTimes[1] += this.vehicles.waitingTimeOfVehicle(vehicle, this);
+				}
+				if(vehicle.getSegment().equals("S3")) {
+					segmentWaitTimes[2] += this.vehicles.waitingTimeOfVehicle(vehicle, this);
+				}
+				if(vehicle.getSegment().equals("S4")) {
+					segmentWaitTimes[3] += this.vehicles.waitingTimeOfVehicle(vehicle, this);
+				}
+			}
+		}
+		segmentWaitTimes[0] = segmentWaitTimes[0] / vehiclesCrossedCounts[0];
+		segmentWaitTimes[1] = segmentWaitTimes[1] / vehiclesCrossedCounts[1];
+		segmentWaitTimes[2] = segmentWaitTimes[2] / vehiclesCrossedCounts[2];
+		segmentWaitTimes[3] = segmentWaitTimes[3] / vehiclesCrossedCounts[3];
+		return segmentWaitTimes;
 	}
 }

@@ -6,6 +6,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -211,8 +213,23 @@ public class GUIMain extends JFrame implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		String action = e.getActionCommand();
 		if (action.equals("Add Vehicle")) {
-			System.out.println("Adding Vehicle");
-			addVehicle();
+			try {
+				addVehicle();
+				System.out.println("Sucesfully added vehicle");
+				JOptionPane.showMessageDialog(null, "Sucesfully added vehicle");
+			}
+			catch(IllegalArgumentException ae){
+				System.out.println("Vehicle could not be added");
+				System.out.println(ae.getMessage());
+				JOptionPane.showMessageDialog(this, ae.getMessage(),
+			               "Could Not Add Vehicle", JOptionPane.ERROR_MESSAGE);
+			}
+			catch(DuplicateVehicleIDException dke) {
+				System.out.println("Vehicle could not be added");
+				System.out.println(dke.getMessage());
+				JOptionPane.showMessageDialog(this, dke.getMessage(),
+			               "Could Not Add Vehicle", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 		if (action.equals("Clear Input")) {
 			System.out.println("Clearing Input");
@@ -220,6 +237,7 @@ public class GUIMain extends JFrame implements ActionListener{
 		}
 		if (action.equals("Exit")) {
 			System.out.println("Exiting");
+			exitFunction();
 		}
 	}
 	
@@ -231,7 +249,7 @@ public class GUIMain extends JFrame implements ActionListener{
 		}
 	}
 	
-	private void addVehicle() {
+	private void addVehicle() throws DuplicateVehicleIDException {
 		String[] vehicleParams = new String[8];
 		int i = 0;
 		while(i <= 7) {
@@ -239,17 +257,28 @@ public class GUIMain extends JFrame implements ActionListener{
 			i++;
 		}
 		
-		//Build vehicle from input params
-		Vehicle vehicle = this.vehicles.buildVehicle(vehicleParams);
-		
-		//Add vehicle to hash map
-		this.vehicles.insertVehicleHashMap(vehicle);
-		
-		//Add vehicle to queue
-		this.phases.insertVehicleQueue(vehicle);
-		
-		//Refresh GUI values
-		refreshGUIValues();
+		//Build vehicle from input params and insert to hash map and queue
+		try {
+			//Build vehicle
+			Vehicle vehicle = this.vehicles.buildVehicle(vehicleParams);
+			
+			try {
+				//Add vehicle to hash map
+				this.vehicles.insertVehicleHashMap(vehicle);
+				
+				//Add vehicle to queue
+				this.phases.insertVehicleQueue(vehicle);
+				
+				//Refresh GUI values
+				refreshGUIValues();
+			}
+			catch(DuplicateVehicleIDException dke) {
+				throw dke;
+			}
+		}
+		catch(IllegalArgumentException ae) {
+			throw ae;
+		}
 	}
 	
 	private void refreshGUIValues() {
@@ -277,7 +306,21 @@ public class GUIMain extends JFrame implements ActionListener{
 		TableModel statisticsTableModel = new DefaultTableModel(statisticsContent, statisticsHeader);
 		this.tableStatistics.setModel(statisticsTableModel);
 		
-		//Update CO2 statistic label
-		this.lblCO2.setText("C02: " + this.vehicles.getTotalCO2());
+		//Update CO2 statistic label - unsure If we should do this? - is this lowered as vehicles pass?
+		//this.lblCO2.setText("C02: " + this.vehicles.getTotalCO2());
+	}
+	
+	private void exitFunction() {
+		int[] vehiclesCrossedCounts = this.vehicles.getVehiclesCrossedCounts();
+		float[] averageSegmentWaitTimes = this.phases.getAverageSegmentWaitingTimes();
+		Object[][] vehicleStatistics = this.vehicles.getSegmentStatistics();
+		String[] lines = new String[5];
+		lines[0] = "Segment 1:-	Vehicles Crossed:" + vehiclesCrossedCounts[0] + " average waiting time: " + averageSegmentWaitTimes[0];
+		lines[1] = "Segment 2:-	Vehicles Crossed:" + vehiclesCrossedCounts[1] + " average waiting time: " + averageSegmentWaitTimes[1];
+		lines[2] = "Segment 3:-	Vehicles Crossed:" + vehiclesCrossedCounts[2] + " average waiting time: " + averageSegmentWaitTimes[2];
+		lines[3] = "Segment 4:-	Vehicles Crossed:" + vehiclesCrossedCounts[3] + " average waiting time: " + averageSegmentWaitTimes[3];
+		lines[4] = "Total emissions: " + this.vehicles.getTotalCO2();
+		ProduceReport.createReport(lines);
+		System.exit(0);
 	}
 }
