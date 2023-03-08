@@ -188,10 +188,10 @@ public class Vehicle {
 		}
 		if (this.segment.equals("S3")) {
 			if (this.direction.equals("Right")) {
-				return "P5";
+				return "P2";
 			}
 			if (this.direction.equals("Left")) {
-				return "P2";
+				return "P5";
 			}
 			if (this.direction.equals("Straight")) {
 				return "P2";
