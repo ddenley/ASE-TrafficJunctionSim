@@ -24,6 +24,9 @@ import javax.swing.table.TableModel;
 import javax.swing.JButton;
 
 public class GUIMain extends JFrame implements ActionListener{
+	
+	public static final String vehiclesCSVFile = "vehicles.csv";
+	public static final String intersectionCSVFile = "intersection.csv";
 
 	private JPanel contentPane;
 	private JTable tableVehicles;
@@ -60,8 +63,8 @@ public class GUIMain extends JFrame implements ActionListener{
 		setTitle("Traffic Junction Simulator");
 		
 		//Initialisation of required classes
-		this.vehicles = new Vehicles();
-		this.phases = new Phases(this.vehicles);
+		this.vehicles = new Vehicles(vehiclesCSVFile);
+		this.phases = new Phases(this.vehicles, intersectionCSVFile);
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1227, 694);

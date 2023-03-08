@@ -9,8 +9,8 @@ public class Vehicles {
 	private HashMap<String, Vehicle> vehiclesHMap = new HashMap<String, Vehicle>();
 	private String[] vehicleHeaders;
 	
-	public Vehicles(){
-		Object[] header_values = ReadCSV.getHeaderValues("vehicles.csv");
+	public Vehicles(String vehiclesCSVFile){
+		Object[] header_values = ReadCSV.getHeaderValues(vehiclesCSVFile);
 		String[] header = (String[]) header_values[0];
 		ArrayList<String[]> values = (ArrayList<String[]>) header_values[1];
 		setCSVHeader(header);

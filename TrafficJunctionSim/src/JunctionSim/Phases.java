@@ -14,11 +14,11 @@ public class Phases {
 	//This variable holds a counter of how many cycles have occurred
 	private int cyclesOccured;
 	
-	public Phases(Vehicles vehicles) {
+	public Phases(Vehicles vehicles, String intersectionCSVFile) {
 		this.vehicles = vehicles;
 		//ReadCSV.getHeaderValues("vehicles.csv");
 		// First read intersection.csv to create phasesHMap and set phaseHeaders
-		Object[] header_values = ReadCSV.getHeaderValues("intersection.csv");
+		Object[] header_values = ReadCSV.getHeaderValues(intersectionCSVFile);
 		String[] header = (String[]) header_values[0];
 		ArrayList<String[]> values = (ArrayList<String[]>) header_values[1];
 		setCSVHeader(header);
