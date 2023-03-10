@@ -1,8 +1,15 @@
 package JunctionSim;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 public class Phases {
 	
@@ -26,19 +33,30 @@ public class Phases {
 		//Now populate each phase queue from the vehicles hash map for initial init
 		populatePhaseQueuesFromHashTable();
 		
-		quickPhaseQueueCheck();
+		//quickPhaseQueueCheck();
 	}
 	
 	private void populateFromCSV(ArrayList<String[]> values) {
 		for (String[] phaseParams : values) {
-			//phaseParams[0] will be phase string ID
-			String phase_name = phaseParams[0];
-			//phaseParamas[1] will be phase duration
-			String phase_duration = phaseParams[1];
-			//Create phase object using phase duration - float conversion occurs within constructor
-			Phase phase = new Phase(phase_duration);
-			//Add phase to hash map
-			this.phasesHMap.putIfAbsent(phase_name, phase);
+			try {
+				//phaseParams[0] will be phase string ID
+				String phase_name = phaseParams[0];
+				//phaseParamas[1] will be phase duration
+				String phase_duration = phaseParams[1];
+				//Create phase object using phase duration - float conversion occurs within constructor
+				try {
+					Phase phase = new Phase(phase_duration);
+					//Add phase to hash map
+					this.phasesHMap.putIfAbsent(phase_name, phase);
+				}
+				catch (IllegalArgumentException ae) {
+					System.out.println(ae.getMessage());
+					System.exit(0);
+				}
+			}
+			catch (ArrayIndexOutOfBoundsException a){
+				throw new InvalidFileFormatException("INTERSECTION CSV FILE");
+			}
 		}
 	}
 	
@@ -95,7 +113,9 @@ public class Phases {
 			String phaseName = entry.getKey();
 			for(String vehicleID : phase.getVehicleKeysQueue()) {
 				phaseVehiclesArray[index][0] = phaseName;
+				//System.out.println(phaseName);
 				phaseVehiclesArray[index][1] = vehicleID;
+				//System.out.println(vehicleID);
 				index++;
 			}
 		}
@@ -103,9 +123,9 @@ public class Phases {
 	}
 	
 	//This method was just to visualise how vehicles were populated into the queues - leaving for future debugging
-	public void quickPhaseQueueCheck() {
+	private void quickPhaseQueueCheck() {
 		for (Phase phase : this.phasesHMap.values()) {
-			//System.out.println(phase.getVehicleKeysQueue());
+			System.out.println(phase.getVehicleKeysQueue());
 		}
 	}
 	

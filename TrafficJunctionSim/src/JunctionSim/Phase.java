@@ -8,14 +8,21 @@ public class Phase {
 	private float phaseDuration;
 	private Queue<String> vehicleKeysQueue = new LinkedList<String>();
 	
-	//This variable holds a counter of how many vehicles have been popped in this cycle
-	//Needs reset each cycle
-	private int vehiclesPopped;
-	
 	public Phase(String phaseDuration) {
+		if (phaseDuration == null || phaseDuration == "") {
+			throw new IllegalArgumentException("Phase duration null");
+		}
+		try {
+			float float_duration = Float.valueOf(phaseDuration);
+		}
+		catch(NumberFormatException e){
+			throw new IllegalArgumentException("Phase duration not numeric");
+		}
 		float float_duration = Float.valueOf(phaseDuration);
+		if (float_duration <= 0 || float_duration >= 300) {
+			throw new IllegalArgumentException("Phase duration out of allowed bounds" + phaseDuration);
+		}
 		this.phaseDuration = float_duration;
-		this.vehiclesPopped = 0;
 	}
 	
 	//Queue methods

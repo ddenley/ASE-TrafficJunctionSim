@@ -25,8 +25,9 @@ import javax.swing.JButton;
 
 public class GUIMain extends JFrame implements ActionListener{
 	
-	public static final String vehiclesCSVFile = "vehicles.csv";
-	public static final String intersectionCSVFile = "intersection.csv";
+	//Must be public and accessible for some testing functions
+	public static String vehiclesCSVFile = "vehicles.csv";
+	public static String intersectionCSVFile = "intersection.csv";
 
 	private JPanel contentPane;
 	private JTable tableVehicles;
@@ -60,6 +61,7 @@ public class GUIMain extends JFrame implements ActionListener{
 	 * Create the frame.
 	 */
 	public GUIMain() {
+		
 		setTitle("Traffic Junction Simulator");
 		
 		//Initialisation of required classes
@@ -135,7 +137,7 @@ public class GUIMain extends JFrame implements ActionListener{
 		contentPane.add(scrollPaneStatistics);
 		
 		//Get header for statistics table
-		String[] statisticsHeader = {"Segment", "Waiting Time", "Total Length", "Avg Cross Time", "Number of Vehicles"};
+		String[] statisticsHeader = {"Segment", "Total Length", "Avg Cross Time", "Number of Vehicles"};
 		//Get content for statistics table
 		Object[][] statisticsContent = this.vehicles.getSegmentStatistics();
 		tableStatistics = new JTable(statisticsContent, statisticsHeader);

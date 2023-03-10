@@ -99,25 +99,18 @@ public class Vehicles {
 	}
 	
 	//Returns the total CO2 of all vehicles in a waiting state as a string
+	//Get emission rate for all vehicles waiting and convert to kg per minute
 	public String getTotalCO2() {
-		//Sum the total crossing time of all vehicles waiting
-		float crossingTimeSum = 0;
-		//Get the average emission rate of all vehicles waiting
 		float emissionRateSum = 0;
-		int waitingCount = 0;
-		//Multiple to get a final CO2 emission of all waiting vehicles
 		for(Vehicle vehicle : vehiclesHMap.values()) {
 			if(vehicle.getStatus().equals("Waiting")) {
-				crossingTimeSum += vehicle.getCrossingTime();
 				emissionRateSum += vehicle.getEmissionRate();
-				waitingCount += 1;
 			}
 		}
-		float averageEmissionRate = emissionRateSum / waitingCount;
-		float waitingCO2 = averageEmissionRate * crossingTimeSum;
 		//Convert to kg
-		waitingCO2 = waitingCO2 / 1000;
-		return String.format("%.2f", waitingCO2) + " KG";
+		emissionRateSum = emissionRateSum / 1000;
+		//Return amount of C02 produced
+		return String.format("%.2f", emissionRateSum) + " KG per minute";
 	}
 	
 	public Object[][] getSegmentStatistics() {
@@ -130,10 +123,10 @@ public class Vehicles {
 		//Init statistic values
 		int i = 0;
 		while(i <= 3) {
+			//segmentStatsArray[i][1] = 0f;
 			segmentStatsArray[i][1] = 0f;
 			segmentStatsArray[i][2] = 0f;
-			segmentStatsArray[i][3] = 0f;
-			segmentStatsArray[i][4] = 0;
+			segmentStatsArray[i][3] = 0;
 			i++;
 		}
 		int index = -1;
@@ -151,19 +144,19 @@ public class Vehicles {
 			else if(vehicle.getSegment().equals("S4")) {
 				index = 3;
 			}
-			//Update total waiting time
-			segmentStatsArray[index][1] = ((float)segmentStatsArray[index][1]) + vehicle.getCrossingTime();
+			//TODO: Update total waiting time - reintroduce in stage 2 - NEEDS TO ACCOUNT FOR CYCLE TIMES
+			//segmentStatsArray[index][1] = ((float)segmentStatsArray[index][1]) + vehicle.getCrossingTime();
 			//Update total length
-			segmentStatsArray[index][2] = ((float)segmentStatsArray[index][2]) + vehicle.getLength();
+			segmentStatsArray[index][1] = ((float)segmentStatsArray[index][1]) + vehicle.getLength();
 			//Update total crossing time - average after
-			segmentStatsArray[index][3] = ((float)segmentStatsArray[index][3]) + vehicle.getCrossingTime();
+			segmentStatsArray[index][2] = ((float)segmentStatsArray[index][2]) + vehicle.getCrossingTime();
 			//Update number of vehicles
-			segmentStatsArray[index][4] = ((int)segmentStatsArray[index][4]) + 1;
+			segmentStatsArray[index][3] = ((int)segmentStatsArray[index][3]) + 1;
 		}
 		//Now average the cross times
 		i = 0;
 		while(i <= 3) {
-			segmentStatsArray[i][3] = ((float)segmentStatsArray[i][3]) / ((int)segmentStatsArray[i][4]);
+			segmentStatsArray[i][2] = ((float)segmentStatsArray[i][2]) / ((int)segmentStatsArray[i][3]);
 			i++;
 		}
 		return segmentStatsArray;

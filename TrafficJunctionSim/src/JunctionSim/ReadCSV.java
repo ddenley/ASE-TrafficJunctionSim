@@ -18,8 +18,8 @@ public class ReadCSV {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(filePath));
 			while((fileLine = br.readLine()) != null) {
-				//Check if file line has contents if not skip
 				fileLine = fileLine.replace(" ", "");
+				//Check if file line has contents if not skip
 				if (fileLine.equals("")) {
 					System.out.println("Invalid file line in: " + filePath);
 					System.out.println("Skipping line");
@@ -46,6 +46,7 @@ public class ReadCSV {
 			}
 			//Throw an exception if there isnt at least two lines - a header and one vehicle
 			if(lineCount < 2 && filePath.equals(GUIMain.vehiclesCSVFile)) {
+				System.out.println(lineCount);
 				throw new InvalidFileFormatException(filePath);
 			}
 			//Throw an exception if there isnt at least eight phases in the intersection file
