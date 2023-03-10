@@ -24,6 +24,11 @@ import javax.swing.table.TableModel;
 import javax.swing.JButton;
 import javax.swing.SwingConstants;
 
+ 
+/**
+ * @author Daniel Denley and Seigha
+ *
+ */
 public class GUIMain extends JFrame implements ActionListener{
 	
 	//Must be public and accessible for some testing functions

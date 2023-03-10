@@ -6,7 +6,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import JunctionSim.GUIMain;
-
+/**
+ * @author Daniel Denley
+ *
+ */
 class GUIMainTest {
 
 	//Note all action methods are private within this class

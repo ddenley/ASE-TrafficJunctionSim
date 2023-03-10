@@ -3,6 +3,10 @@ package JunctionSim;
 import java.util.LinkedList;
 import java.util.Queue;
 
+/**
+ * @author Daniel Denley
+ *
+ */
 public class Phase {
 	
 	//Phase object composed of a vehicle key queue and phase duration

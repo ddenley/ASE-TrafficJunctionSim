@@ -5,7 +5,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 import JunctionSim.ProduceReport;
-
+/**
+ * @author Daniel Denley
+ *
+ */
 class ProduceReportTest {
 
 	//Only need to test validity of method

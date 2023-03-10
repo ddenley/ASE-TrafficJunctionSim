@@ -10,7 +10,10 @@ import org.junit.jupiter.api.Test;
 import JunctionSim.GUIMain;
 import JunctionSim.InvalidFileFormatException;
 import JunctionSim.ReadCSV;
-
+/**
+ * @author Daniel Denley
+ *
+ */
 class ReadCSVTest {
 	
 	GUIMain main;

@@ -4,6 +4,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;   
 
+/**
+ * @author Daniel Denley
+ *
+ */
 public class ProduceReport {
 	
 	//Function adapted from: https://www.javatpoint.com/java-get-current-date

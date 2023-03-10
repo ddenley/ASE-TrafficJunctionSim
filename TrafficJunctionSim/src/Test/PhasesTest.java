@@ -8,7 +8,10 @@ import JunctionSim.InvalidFileFormatException;
 import JunctionSim.Phases;
 import JunctionSim.Vehicle;
 import JunctionSim.Vehicles;
-
+/**
+ * @author Daniel Denley
+ *
+ */
 class PhasesTest {
 
 	@Test

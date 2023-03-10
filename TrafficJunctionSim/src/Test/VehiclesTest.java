@@ -15,7 +15,7 @@ import JunctionSim.Vehicle;
 import JunctionSim.Vehicles;
 
 /**
- * @author Daniel Denley
+ * @author Daniel Denley and Ahmad
  *
  */
 class VehiclesTest {

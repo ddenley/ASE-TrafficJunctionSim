@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import JunctionSim.Vehicle;
 
 /**
- * @author danie
+ * @author Daniel Denley and Ahmad
  *
  */
 class VehicleTest {

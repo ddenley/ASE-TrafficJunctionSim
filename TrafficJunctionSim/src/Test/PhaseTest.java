@@ -5,7 +5,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 import JunctionSim.Phase;
-
+/**
+ * @author Daniel Denley
+ *
+ */
 class PhaseTest {
 
 	//Tests for constructor

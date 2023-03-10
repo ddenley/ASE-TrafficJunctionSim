@@ -4,6 +4,10 @@ import java.util.HashMap;
 
 import java.util.ArrayList;
 
+/**
+ * @author Daniel Denley
+ *
+ */
 public class Vehicles {
 	
 	//Vehicles object holds a hashmap of all vehicles - efficiently accessed via their key

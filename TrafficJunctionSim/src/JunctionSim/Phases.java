@@ -11,6 +11,10 @@ import java.util.Queue;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+/**
+ * @author Daniel Denley
+ *
+ */
 public class Phases {
 	
 	// Hash map will have phase string as ID and a phase object which holds a queue of vehicles

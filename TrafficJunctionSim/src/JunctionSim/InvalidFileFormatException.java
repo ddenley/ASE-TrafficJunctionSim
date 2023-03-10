@@ -1,5 +1,9 @@
 package JunctionSim;
 
+/**
+ * @author Daniel Denley
+ *
+ */
 public class InvalidFileFormatException extends RuntimeException{
 	
 	public InvalidFileFormatException(String fileName) {

@@ -6,6 +6,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * @author Daniel Denley
+ *
+ */
+
 public class ReadCSV {
 	
 	//Static method for reading and parsing the contents of a CSV file - either intersection or vehicles
