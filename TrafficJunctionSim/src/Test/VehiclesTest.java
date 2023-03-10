@@ -68,7 +68,7 @@ class VehiclesTest {
 	@Test
 	final void testGetTotalC02() {
 		Vehicles vehicles = new Vehicles("TestData/VehiclesTestCSVs/test_vehicles_valid_for_stats.csv");
-		String actual = vehicles.getTotalCO2();
+		String actual = vehicles.getTotalCO2PerMinute();
 		float emissionRateSum = 12 + 7 + 9 + 12 + 12;
 		float expectedFloat = emissionRateSum / 1000;
 		String expected = String.format("%.2f", expectedFloat) + " KG per minute";

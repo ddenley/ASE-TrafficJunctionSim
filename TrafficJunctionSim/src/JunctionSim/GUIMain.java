@@ -22,6 +22,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.JButton;
+import javax.swing.SwingConstants;
 
 public class GUIMain extends JFrame implements ActionListener{
 	
@@ -39,7 +40,7 @@ public class GUIMain extends JFrame implements ActionListener{
 	private JTable tableStatistics;
 	private JTable tableAddVehicle;
 	
-	private JLabel lblCO2;
+	private JLabel lblCO2PerMinute;
 
 	/**
 	 * Launch the application.
@@ -61,6 +62,7 @@ public class GUIMain extends JFrame implements ActionListener{
 	 * Create the frame.
 	 */
 	public GUIMain() {
+		setResizable(false);
 		
 		setTitle("Traffic Junction Simulator");
 		
@@ -77,8 +79,9 @@ public class GUIMain extends JFrame implements ActionListener{
 		contentPane.setLayout(null);
 		
 		JLabel lblVehicles = new JLabel("Vehicles");
-		lblVehicles.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		lblVehicles.setBounds(208, 11, 68, 29);
+		lblVehicles.setHorizontalAlignment(SwingConstants.CENTER);
+		lblVehicles.setFont(new Font("Verdana", Font.BOLD, 15));
+		lblVehicles.setBounds(10, 11, 663, 29);
 		contentPane.add(lblVehicles);
 		
 		JScrollPane scrollPaneVehicles = new JScrollPane();
@@ -91,11 +94,14 @@ public class GUIMain extends JFrame implements ActionListener{
 		// Get content for vehicles table
 		Object[][] vehiclesContents = this.vehicles.getVehicles2DArray();
 		tableVehicles = new JTable(vehiclesContents, vehiclesHeader);
+		tableVehicles.setEnabled(false);
 		tableVehicles.setFillsViewportHeight(true);
 		scrollPaneVehicles.setViewportView(tableVehicles);
 		
 		JLabel lblPhases = new JLabel("Phases Setup");
-		lblPhases.setBounds(778, 20, 75, 14);
+		lblPhases.setHorizontalAlignment(SwingConstants.CENTER);
+		lblPhases.setFont(new Font("Verdana", Font.BOLD, 15));
+		lblPhases.setBounds(714, 18, 211, 14);
 		contentPane.add(lblPhases);
 		
 		JScrollPane scrollPanePhases = new JScrollPane();
@@ -107,11 +113,14 @@ public class GUIMain extends JFrame implements ActionListener{
 		//Get content for phases table
 		Object[][] phasesContent = this.phases.getPhases2DObjectArray();
 		tablePhases = new JTable(phasesContent, phasesHeader);
+		tablePhases.setEnabled(false);
 		tablePhases.setFillsViewportHeight(true);
 		scrollPanePhases.setViewportView(tablePhases);
 		
 		JLabel lblPhaseVehicles = new JLabel("Vehicles Phase Allocation");
-		lblPhaseVehicles.setBounds(986, 20, 167, 14);
+		lblPhaseVehicles.setHorizontalAlignment(SwingConstants.CENTER);
+		lblPhaseVehicles.setFont(new Font("Verdana", Font.BOLD, 15));
+		lblPhaseVehicles.setBounds(969, 20, 232, 14);
 		contentPane.add(lblPhaseVehicles);
 		
 		JScrollPane scrollPanePhaseAllocation = new JScrollPane();
@@ -125,11 +134,14 @@ public class GUIMain extends JFrame implements ActionListener{
 		//***************************FOR SOME REASON THIS NEEDS CHANGED OR DESIGNER WILL NOT WORK ON ECLIPSE*******************************************
 		tablePhaseAllocation = new JTable(phaseAllocationContent, phaseAllocationHeader);
 		//tablePhaseAllocation = new JTable();
+		tablePhaseAllocation.setEnabled(false);
 		tablePhaseAllocation.setFillsViewportHeight(true);
 		scrollPanePhaseAllocation.setViewportView(tablePhaseAllocation);
 		
 		JLabel lblStatistics = new JLabel("Statistics");
-		lblStatistics.setBounds(929, 363, 87, 14);
+		lblStatistics.setFont(new Font("Verdana", Font.BOLD, 15));
+		lblStatistics.setHorizontalAlignment(SwingConstants.CENTER);
+		lblStatistics.setBounds(714, 365, 487, 14);
 		contentPane.add(lblStatistics);
 		
 		JScrollPane scrollPaneStatistics = new JScrollPane();
@@ -142,20 +154,25 @@ public class GUIMain extends JFrame implements ActionListener{
 		Object[][] statisticsContent = this.vehicles.getSegmentStatistics();
 		tableStatistics = new JTable(statisticsContent, statisticsHeader);
 		//tableStatistics = new JTable();
+		tableStatistics.setEnabled(false);
 		tableStatistics.setFillsViewportHeight(true);
 		scrollPaneStatistics.setViewportView(tableStatistics);
 		
 		JComboBox comboBoxVehicleSort = new JComboBox();
+		comboBoxVehicleSort.setFont(new Font("Verdana", Font.PLAIN, 13));
 		comboBoxVehicleSort.setModel(new DefaultComboBoxModel(new String[] {"ID", "Type", "Segment"}));
 		comboBoxVehicleSort.setBounds(586, 363, 87, 22);
 		contentPane.add(comboBoxVehicleSort);
 		
 		JLabel lblSortBy = new JLabel("Sort By:");
-		lblSortBy.setBounds(530, 367, 46, 14);
+		lblSortBy.setFont(new Font("Verdana", Font.PLAIN, 13));
+		lblSortBy.setBounds(508, 362, 81, 20);
 		contentPane.add(lblSortBy);
 		
 		JLabel lblAddVehicle = new JLabel("Add Vehicle");
-		lblAddVehicle.setBounds(242, 491, 75, 14);
+		lblAddVehicle.setHorizontalAlignment(SwingConstants.CENTER);
+		lblAddVehicle.setFont(new Font("Verdana", Font.BOLD, 15));
+		lblAddVehicle.setBounds(10, 508, 766, 14);
 		contentPane.add(lblAddVehicle);
 		
 		JScrollPane scrollPaneAddVehicle = new JScrollPane();
@@ -163,6 +180,7 @@ public class GUIMain extends JFrame implements ActionListener{
 		contentPane.add(scrollPaneAddVehicle);
 		
 		tableAddVehicle = new JTable();
+		tableAddVehicle.setFont(new Font("Verdana", Font.PLAIN, 13));
 		tableAddVehicle.setFillsViewportHeight(true);
 		tableAddVehicle.setModel(new DefaultTableModel(
 			new Object[][] {
@@ -183,35 +201,35 @@ public class GUIMain extends JFrame implements ActionListener{
 		scrollPaneAddVehicle.setViewportView(tableAddVehicle);
 		
 		JButton btnAddVehicle = new JButton("Add Vehicle");
+		btnAddVehicle.setFont(new Font("Verdana", Font.PLAIN, 13));
 		btnAddVehicle.setBounds(10, 609, 125, 23);
 		contentPane.add(btnAddVehicle);
 		btnAddVehicle.addActionListener(this);
 		btnAddVehicle.setActionCommand("Add Vehicle");
 		
 		JButton btnClearVehicleInput = new JButton("Clear Input");
+		btnClearVehicleInput.setFont(new Font("Verdana", Font.PLAIN, 13));
 		btnClearVehicleInput.setBounds(220, 609, 125, 23);
 		contentPane.add(btnClearVehicleInput);
 		btnClearVehicleInput.addActionListener(this);
 		btnClearVehicleInput.setActionCommand("Clear Input");
 		
 		JButton btnExit = new JButton("Exit");
+		btnExit.setFont(new Font("Verdana", Font.PLAIN, 13));
 		btnExit.setBounds(1076, 609, 125, 23);
 		contentPane.add(btnExit);
 		btnExit.addActionListener(this);
 		btnExit.setActionCommand("Exit");
 		
-		lblCO2 = new JLabel("C02: " + this.vehicles.getTotalCO2());
-		lblCO2.setBounds(10, 430, 139, 14);
-		contentPane.add(lblCO2);
+		lblCO2PerMinute = new JLabel("C02: " + this.vehicles.getTotalCO2PerMinute());
+		lblCO2PerMinute.setFont(new Font("Verdana", Font.PLAIN, 13));
+		lblCO2PerMinute.setBounds(10, 381, 338, 22);
+		contentPane.add(lblCO2PerMinute);
 		
-		JLabel lblSwithPhaseMode = new JLabel("Phase Mode:");
-		lblSwithPhaseMode.setBounds(10, 371, 109, 14);
-		contentPane.add(lblSwithPhaseMode);
-		
-		JComboBox comboBoxPhaseMode = new JComboBox();
-		comboBoxPhaseMode.setModel(new DefaultComboBoxModel(new String[] {"8 Phase", "4 Phase"}));
-		comboBoxPhaseMode.setBounds(86, 367, 87, 22);
-		contentPane.add(comboBoxPhaseMode);
+		JLabel lblC02Estimate = new JLabel("Estimated Total C02 During Simulation: " + phases.getTotalCO2Estimate());
+		lblC02Estimate.setFont(new Font("Verdana", Font.PLAIN, 13));
+		lblC02Estimate.setBounds(10, 426, 359, 29);
+		contentPane.add(lblC02Estimate);
 	}
 
 	@Override
@@ -305,7 +323,7 @@ public class GUIMain extends JFrame implements ActionListener{
 				
 		//Refresh tables - Statistic Table
 		//Get header for statistics table
-		String[] statisticsHeader = {"Segment", "Waiting Time", "Total Length", "Avg Cross Time", "Number of Vehicles"};
+		String[] statisticsHeader = {"Segment", "Total Length", "Avg Cross Time", "Number of Vehicles"};
 		//Get content for statistics table
 		Object[][] statisticsContent = this.vehicles.getSegmentStatistics();
 		TableModel statisticsTableModel = new DefaultTableModel(statisticsContent, statisticsHeader);
@@ -324,7 +342,7 @@ public class GUIMain extends JFrame implements ActionListener{
 		lines[1] = "Segment 2:-	Vehicles Crossed:" + vehiclesCrossedCounts[1] + " average waiting time: " + averageSegmentWaitTimes[1];
 		lines[2] = "Segment 3:-	Vehicles Crossed:" + vehiclesCrossedCounts[2] + " average waiting time: " + averageSegmentWaitTimes[2];
 		lines[3] = "Segment 4:-	Vehicles Crossed:" + vehiclesCrossedCounts[3] + " average waiting time: " + averageSegmentWaitTimes[3];
-		lines[4] = "Total emissions: " + this.vehicles.getTotalCO2();
+		lines[4] = "Total emissions: " + this.vehicles.getTotalCO2PerMinute();
 		ProduceReport.createReport(lines);
 		System.exit(0);
 	}

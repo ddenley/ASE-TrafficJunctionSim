@@ -100,7 +100,7 @@ public class Vehicles {
 	
 	//Returns the total CO2 of all vehicles in a waiting state as a string
 	//Get emission rate for all vehicles waiting and convert to kg per minute
-	public String getTotalCO2() {
+	public String getTotalCO2PerMinute() {
 		float emissionRateSum = 0;
 		for(Vehicle vehicle : vehiclesHMap.values()) {
 			if(vehicle.getStatus().equals("Waiting")) {
@@ -185,6 +185,7 @@ public class Vehicles {
 		return segmentCrossedCounts;
 	}
 	
+	//TODO: THIS METHOD IS FOR STAGE 2 FURTHER IMPLEMENTATION PLEASE IGNORE
 	//Require knowledge of phases for phase durations
 	public float waitingTimeOfVehicle(Vehicle vehicle, Phases phases) {
 		//Get number of cycles that passed before this vehicle crossed
@@ -208,6 +209,18 @@ public class Vehicles {
 		}
 		//Return sum of the cycle waiting time and phase waiting time
 		return phaseWaitingTime + cycleWaitingTime;
+	}
+	
+	public int getVehicleCount() {
+		return vehiclesHMap.size();
+	}
+	
+	public float getEmissionRateSum() {
+		float emissionRateSum = 0;
+		for(Vehicle vehicle : vehiclesHMap.values()) {
+			emissionRateSum += vehicle.getEmissionRate();
+		}
+		return emissionRateSum;
 	}
 	//TODO: Sorting methods?
 }

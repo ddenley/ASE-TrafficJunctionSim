@@ -32,8 +32,6 @@ public class Phases {
 		populateFromCSV(values);
 		//Now populate each phase queue from the vehicles hash map for initial init
 		populatePhaseQueuesFromHashTable();
-		
-		//quickPhaseQueueCheck();
 	}
 	
 	private void populateFromCSV(ArrayList<String[]> values) {
@@ -148,6 +146,7 @@ public class Phases {
 		return cycleTime;
 	}
 	
+	//Waiting times due to vehicles
 	public float[] getAverageSegmentWaitingTimes() {
 		float[] segmentWaitTimes = new float[4];
 		int[] vehiclesCrossedCounts = this.vehicles.getVehiclesCrossedCounts();
@@ -176,5 +175,115 @@ public class Phases {
 		segmentWaitTimes[2] = segmentWaitTimes[2] / vehiclesCrossedCounts[2];
 		segmentWaitTimes[3] = segmentWaitTimes[3] / vehiclesCrossedCounts[3];
 		return segmentWaitTimes;
+	}
+	
+	//Returns phase it will end on(index), and how many times this phase will run, remainder of last phase that will run
+	private int[] phaseRunCounts() {
+		float remainderOfLastPhase = 0;
+		//First I want to find how many cycles each phase requires
+		int[] phaseCycles = new int[8];
+		float[] phaseDurations = new float[8];
+		//Populate phase durations into an array
+		int phaseIndex = 0;
+		for(Phase p : phasesHMap.values()) {
+			phaseDurations[phaseIndex] = p.getPhaseDuration();
+			phaseIndex +=1;
+		}
+		//Next I will create an array of total crossing times per phase	
+		float[] phaseCrossingsSum = new float[8];
+		phaseIndex = 0;
+		for(Phase p :phasesHMap.values()) {
+			//Grab queue within phase - iterate over vehicle keys
+			float crossingSum = 0;
+			for(String vehicleKey: p.getVehicleKeysQueue()) {
+				//Retrieve vehicle
+				Vehicle vehicle = vehicles.getVehiclesHashMap().get(vehicleKey);
+				//Add crossing time
+				crossingSum += vehicle.getCrossingTime();
+			}
+			phaseCrossingsSum[phaseIndex] = crossingSum;
+			phaseIndex +=1;
+		}
+		//Now I want to divide and cast to an int to remove decimals - this gives phase cycles
+		phaseIndex = 0;
+		while (phaseIndex <= 7) {
+			phaseCycles[phaseIndex] = 0;
+			if (phaseCrossingsSum[phaseIndex] != 0) {
+				phaseCycles[phaseIndex] += (int)Math.ceil(phaseCrossingsSum[phaseIndex] / phaseDurations[phaseIndex]);
+				remainderOfLastPhase = phaseCrossingsSum[phaseIndex] % phaseDurations[phaseIndex];
+			}
+			phaseIndex +=1;
+		}
+		//Identify phase it will end on and how many times it will run
+		phaseIndex = 0;
+		int indexOfPhaseEndedOn = 0;
+		int numberOfTimesPhaseRan = 0;
+		int prevHighestRuns = 0;
+		while (phaseIndex <= 7) {
+			if(phaseCycles[phaseIndex] > prevHighestRuns) {
+				indexOfPhaseEndedOn = phaseIndex;
+				numberOfTimesPhaseRan = phaseCycles[phaseIndex];
+				prevHighestRuns = phaseCycles[phaseIndex];
+			}
+			phaseIndex +=1;
+		}
+		//Handle cases were only once cycle occurs
+		//Return phase index with highest sum of crossing times
+		if(numberOfTimesPhaseRan == 1) {
+			phaseIndex = 0;
+			indexOfPhaseEndedOn = 0;
+			float prevHighestSum = 0;
+			while (phaseIndex <= 7) {
+				if(phaseCrossingsSum[phaseIndex] > prevHighestSum) {
+					indexOfPhaseEndedOn = phaseIndex;
+					prevHighestSum = phaseCrossingsSum[phaseIndex];
+				}
+				phaseIndex +=1;
+			}
+		}
+		int[] returnValues = {indexOfPhaseEndedOn,numberOfTimesPhaseRan};
+		return returnValues;
+	}
+	
+	//Sum of waiting times due to cycles occured and phases before it
+	private float[] getPhaseWaitingTimeTotals() {
+		float[] phaseWaitSums = {0,0,0,0,0,0,0,0};
+		float[] phaseDurations = getPhaseDurations();
+		//Get phase ended on
+		int phaseEndedOn = phaseRunCounts()[0];
+		int phaseIndex = 1;
+		float waitSum = 0;
+		while(phaseIndex <= phaseEndedOn) {
+			phaseWaitSums[phaseIndex] = phaseDurations[phaseIndex] + waitSum;
+			waitSum += phaseDurations[phaseIndex];
+			phaseIndex+=1;
+		}
+		//Now add the cycle times
+		int cyclesOccured = phaseRunCounts()[1] - 1;
+		phaseIndex = 0;
+		while(phaseIndex <= 7) {
+			phaseWaitSums[phaseIndex] += (cyclesOccured * getCycleTime());
+			//System.out.println(phaseWaitSums[phaseIndex]);
+			phaseIndex+=1;
+		}
+		return phaseWaitSums;
+	}
+	
+	//Returns an estimate of the total CO2 to be produced
+	//Average wait time of vehicle / 60 * average emission rate * number of vehicles
+	//Divide by 1000 for kg
+	public float getTotalCO2Estimate() {
+		//Average wait time of vehicle
+		float closeEstimateOfSimulationDuration = 0;
+		for(float duration : getPhaseWaitingTimeTotals()) {
+			if(duration > closeEstimateOfSimulationDuration) {
+				closeEstimateOfSimulationDuration = duration;
+			}
+		}
+		float avgVehicleWaitTime = closeEstimateOfSimulationDuration * vehicles.getVehicleCount();
+		float avgEmissionRate = vehicles.getEmissionRateSum() / vehicles.getVehicleCount();
+		float CO2Estimate = ((avgVehicleWaitTime / 60) * avgEmissionRate * vehicles.getVehicleCount()) / 1000;
+		//System.out.println(CO2Estimate);
+		return CO2Estimate;
 	}
 }
