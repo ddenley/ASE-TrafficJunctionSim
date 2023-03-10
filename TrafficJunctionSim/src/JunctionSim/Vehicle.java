@@ -16,11 +16,13 @@ public class Vehicle {
 	private String status;
 	private String segment;
 	
+	//TODO: These variables are for implementation in STAGE 2 can ignore
 	//This variable will hold how many cycles occurred before this vehicle crossed
 	private int cyclesBeforeCross;
 	//This variable holds how many vehicles passed before this one in the phase it crossed
 	private int phaseVehicleTurn;
 	
+	//Conscious decision to not use ENUMS here as was reducing code readability
 	//Variable for allowed vehicle types
 	private final List<String> allowedVehicles = Arrays.asList("Bus", "Car", "Van");
 	//Variable for allowed vehicle directions
@@ -31,7 +33,9 @@ public class Vehicle {
 	private final List<String> allowedSegments = Arrays.asList("S1", "S2", "S3", "S4");
 	
 	
-	//Constructor
+	//Constructor for vehicle object
+	//Throws illegal argument exceptions and responsible for casting inputs to correct data type
+	//Illegal argument exceptions are handled if vehicle is created from GUI
 	public Vehicle(String vehicleID, String type, String crossingTime, String direction,
 			String length, String emissionRate, String status, String segment){
 		
@@ -159,8 +163,6 @@ public class Vehicle {
 		this.phaseVehicleTurn = 0;
 	}
 	
-	//Need method(s) here to calculate phase allocation
-	
 	//Method for determining allocation in an eight phase layout
 	public String getEightPhaseAllocation() {
 		//Phase determined by direction and segment
@@ -211,7 +213,7 @@ public class Vehicle {
 		return null;
 	}
 	
-	//Getters	
+	//Getters
 	public String getVehicleID() {
 		return this.vehicleID;
 	}

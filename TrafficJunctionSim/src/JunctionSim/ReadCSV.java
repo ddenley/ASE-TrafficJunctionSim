@@ -8,7 +8,10 @@ import java.util.ArrayList;
 
 public class ReadCSV {
 	
-	//Get CSV headers
+	//Static method for reading and parsing the contents of a CSV file - either intersection or vehicles
+	//Can throw invalidFileFormatExceptions to JVM to prevent illegal states - e.g. no content after header
+	//Will ignore blank lines within a csv file
+	//Returns both the header of the csv[0] and the values[1] within an object array
 	public static Object[] getHeaderValues(String filePath) {
 		Object[] header_values = new Object[2];
 		String[] header = null;

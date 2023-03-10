@@ -232,6 +232,7 @@ public class GUIMain extends JFrame implements ActionListener{
 		contentPane.add(lblC02Estimate);
 	}
 
+	//Method handles action events on the GUI
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String action = e.getActionCommand();
@@ -264,6 +265,7 @@ public class GUIMain extends JFrame implements ActionListener{
 		}
 	}
 	
+	//Clear the JTable for user input
 	private void clearInput() {
 		int i = 0;
 		while(i <= 7) {
@@ -272,6 +274,8 @@ public class GUIMain extends JFrame implements ActionListener{
 		}
 	}
 	
+	//Takes vehicles params from the user input JTable
+	//Can throw duplicate vehicle ID or Illegal Vehicle Constructor Argument Exceptions
 	private void addVehicle() throws DuplicateVehicleIDException {
 		String[] vehicleParams = new String[8];
 		int i = 0;
@@ -289,8 +293,10 @@ public class GUIMain extends JFrame implements ActionListener{
 				//Add vehicle to hash map
 				this.vehicles.insertVehicleHashMap(vehicle);
 				
-				//Add vehicle to queue
-				this.phases.insertVehicleQueue(vehicle);
+				//Add vehicle to queue if in waiting state
+				if(vehicle.getStatus().equals("Waiting")) {
+					this.phases.insertVehicleQueue(vehicle);
+				}
 				
 				//Refresh GUI values
 				refreshGUIValues();
@@ -304,6 +310,8 @@ public class GUIMain extends JFrame implements ActionListener{
 		}
 	}
 	
+	//Method responsible for reloading relevant GUI components on update
+	//Build table models which are then used to update the JTables
 	private void refreshGUIValues() {
 		//Refresh tables - Vehicle table
 		// Get header for vehicles table
@@ -333,6 +341,9 @@ public class GUIMain extends JFrame implements ActionListener{
 		//this.lblCO2.setText("C02: " + this.vehicles.getTotalCO2());
 	}
 	
+	//Function ran on click of JButton exit
+	//Here is responsible for building the main content of the report via a string array
+	//This is static passed to ProduceReport which handles writing to the report file
 	private void exitFunction() {
 		int[] vehiclesCrossedCounts = this.vehicles.getVehiclesCrossedCounts();
 		float[] averageSegmentWaitTimes = this.phases.getAverageSegmentWaitingTimes();

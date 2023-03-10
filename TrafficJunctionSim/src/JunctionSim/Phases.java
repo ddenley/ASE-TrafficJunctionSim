@@ -16,14 +16,19 @@ public class Phases {
 	// Hash map will have phase string as ID and a phase object which holds a queue of vehicles
 	private HashMap<String, Phase> phasesHMap = new HashMap<String, Phase>();
 	private String[] phaseHeaders;
+	
+	//Holds a reference to the vehicles object for population of its queues
+	//Also allows easier calculations for CO2 estimates which require phase duration and queue knowledge
 	private Vehicles vehicles;
 	
+	//TODO: THIS VARIABLE IS TO BE USED IN STAGE 2
 	//This variable holds a counter of how many cycles have occurred
 	private int cyclesOccured;
 	
+	//Phases constructor takes reference to vehicles for queue population
+	//Reference to init csv file for phase durations and names
 	public Phases(Vehicles vehicles, String intersectionCSVFile) {
 		this.vehicles = vehicles;
-		//ReadCSV.getHeaderValues("vehicles.csv");
 		// First read intersection.csv to create phasesHMap and set phaseHeaders
 		Object[] header_values = ReadCSV.getHeaderValues(intersectionCSVFile);
 		String[] header = (String[]) header_values[0];
@@ -34,6 +39,9 @@ public class Phases {
 		populatePhaseQueuesFromHashTable();
 	}
 	
+	//Method can throw an unhandled InvalidFileFormatException to ensure we do not enter a weird state
+	//Invalid files include if phase number is invalid
+	//Invalid phase paramaters throw from phase constructor and exit gracefully here
 	private void populateFromCSV(ArrayList<String[]> values) {
 		for (String[] phaseParams : values) {
 			try {
@@ -58,11 +66,13 @@ public class Phases {
 		}
 	}
 	
+	//Sets instane header value used for GUI
 	private void setCSVHeader(String[] header) {
 		this.phaseHeaders = header;
 	}
 	
-	//https://stackoverflow.com/questions/5826384/java-iteration-through-a-hashmap-which-is-more-efficient
+	//Method uses vehicles refrence to populate each vehicle to relevant queue
+	//Relies on vehiclesPhaseAllocation method for inserting into correct queue
 	private void populatePhaseQueuesFromHashTable() {
 		for (Map.Entry<String, Vehicle> entry : this.vehicles.getVehiclesHashMap().entrySet())
         {
@@ -77,6 +87,8 @@ public class Phases {
         }
 	}
 	
+	//Method takes a vehicle object and inserts into correct queue
+	//Called when adding vehicles from GUI
 	public void insertVehicleQueue(Vehicle v) {
 		String phase_key = v.getEightPhaseAllocation();
 		String vehicle_key = v.getVehicleID();
@@ -88,6 +100,8 @@ public class Phases {
 		return this.phaseHeaders;
 	}
 	
+	//Method required as JTables will only accept 2D object arrays not hash maps
+	//Method used for GUI population of phases table
 	public Object[][] getPhases2DObjectArray(){
 		Object[][] phaseArray = new Object[phasesHMap.size()][2];
 		int index = 0;
@@ -101,6 +115,7 @@ public class Phases {
 		return phaseArray;
 	}
 	
+	//Method used for GUI population of vehicles-phase allocation table
 	public Object[][] getPhasesVehicles2DObjectArray(){
 		Object[][] phaseVehiclesArray = new Object[vehicles.getVehiclesHashMap().size()][2];
 		int index = 0;
@@ -120,6 +135,7 @@ public class Phases {
 		return phaseVehiclesArray;
 	}
 	
+	//CAN IGNORE DEBUG METHOD TO HELP VISUALISE QUEUE ALLOCATION
 	//This method was just to visualise how vehicles were populated into the queues - leaving for future debugging
 	private void quickPhaseQueueCheck() {
 		for (Phase phase : this.phasesHMap.values()) {
@@ -137,6 +153,7 @@ public class Phases {
 		return phaseDurations;
 	}
 	
+	//Method sums each phase duration to produce a cycle time/duration
 	public float getCycleTime() {
 		//Get the cumulative time of a cycle
 		float cycleTime = 0;
@@ -147,6 +164,8 @@ public class Phases {
 	}
 	
 	//Waiting times due to vehicles
+	//Method simply produces an average segment waiting time for a vehicle
+	//Disregards phase wait time
 	public float[] getAverageSegmentWaitingTimes() {
 		float[] segmentWaitTimes = new float[4];
 		int[] vehiclesCrossedCounts = this.vehicles.getVehiclesCrossedCounts();
@@ -177,7 +196,9 @@ public class Phases {
 		return segmentWaitTimes;
 	}
 	
-	//Returns phase it will end on(index), and how many times this phase will run, remainder of last phase that will run
+	//Method calculates the phase that will be the last AND
+	//Method calculates how many times the last phase will run
+	//Returns phase it will end on(index), and how many times this phase will run
 	private int[] phaseRunCounts() {
 		float remainderOfLastPhase = 0;
 		//First I want to find how many cycles each phase requires
@@ -246,6 +267,10 @@ public class Phases {
 	}
 	
 	//Sum of waiting times due to cycles occured and phases before it
+	//Returns a float array of these phase waiting times - 
+	//Does not regard the final waiting time of the last crossing vehicles
+	//But produces a good estimate of the simulation duration for total CO2 calculation
+	//Without having to run a mock simulation
 	private float[] getPhaseWaitingTimeTotals() {
 		float[] phaseWaitSums = {0,0,0,0,0,0,0,0};
 		float[] phaseDurations = getPhaseDurations();

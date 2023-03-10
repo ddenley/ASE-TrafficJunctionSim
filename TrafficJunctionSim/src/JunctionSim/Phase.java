@@ -5,9 +5,13 @@ import java.util.Queue;
 
 public class Phase {
 	
+	//Phase object composed of a vehicle key queue and phase duration
+	//Accessed via getters
 	private float phaseDuration;
 	private Queue<String> vehicleKeysQueue = new LinkedList<String>();
 	
+	//Constructor handles bad paramater input from files
+	//Illegal arguments here are left to be handled by the JVM - we do not want to proceed
 	public Phase(String phaseDuration) {
 		if (phaseDuration == null || phaseDuration == "") {
 			throw new IllegalArgumentException("Phase duration null");

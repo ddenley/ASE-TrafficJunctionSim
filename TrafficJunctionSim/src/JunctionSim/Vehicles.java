@@ -6,9 +6,15 @@ import java.util.ArrayList;
 
 public class Vehicles {
 	
+	//Vehicles object holds a hashmap of all vehicles - efficiently accessed via their key
+	//Hash map implementation as during simulation popping of vehicle keys from phase queues allows efficient updating
 	private HashMap<String, Vehicle> vehiclesHMap = new HashMap<String, Vehicle>();
+	//Header variable used in GUI
 	private String[] vehicleHeaders;
 	
+	//Constructor reads from csv file
+	//Sets header variable for GUI from csv
+	//Populates hash map with values from csv
 	public Vehicles(String vehiclesCSVFile){
 		Object[] header_values = ReadCSV.getHeaderValues(vehiclesCSVFile);
 		String[] header = (String[]) header_values[0];
@@ -21,6 +27,10 @@ public class Vehicles {
 		this.vehicleHeaders = header;
 	}
 	
+	//Method which accepts an array list of values produced from csv file
+	//Places them into hashmap using vehicle ID as key, vehicle object as value
+	//Duplicate key exception handled here as if from CSV should be caught and ignored
+	//GUI also handles via producing an error message
 	private void populateFromCSV(ArrayList<String[]> values) {
 		for (String[] vehicleParams : values) {
 			//Build a vehicle object using the file parameters
@@ -41,6 +51,8 @@ public class Vehicles {
 		}
 	}
 	
+	//Method for creating a vehicle object
+	//Improves code reusability and readability
 	public Vehicle buildVehicle(String vehicleParams[]) {
 		//Decided to handle parsings from strings in vehicles constructor
 		try {
@@ -61,7 +73,8 @@ public class Vehicles {
 		}
 	}
 	
-
+	//Method inserts vehicle key, vehicle pair into hashmap
+	//Throws duplicate vehicle ID exception
 	public void insertVehicleHashMap(Vehicle v) throws DuplicateVehicleIDException{
 		if(this.vehiclesHMap.containsKey(v.getVehicleID())) {
 			throw new DuplicateVehicleIDException(v.getVehicleID());
@@ -75,7 +88,7 @@ public class Vehicles {
 	}
 	
 	//Getter for vehicles 2D array for GUI display
-	//Take an optional sorting argument?
+	//Take an optional sorting argument? - Stage 2
 	public Object[][] getVehicles2DArray(){
 		Object[][] vehiclesArray = new Object[this.vehiclesHMap.size()][8];
 		int index = 0;
@@ -113,6 +126,8 @@ public class Vehicles {
 		return String.format("%.2f", emissionRateSum) + " KG per minute";
 	}
 	
+	//Method builds a 2D object array for the statistics JTable in the GUI
+	//Uses class methods to produce needed values
 	public Object[][] getSegmentStatistics() {
 		Object[][] segmentStatsArray = new Object[4][5];
 		//Set segment names for segmentStatsArray
@@ -162,6 +177,7 @@ public class Vehicles {
 		return segmentStatsArray;
 	}
 	
+	//Method returns the amount of vehicles crossed for each segment
 	public int[] getVehiclesCrossedCounts() {
 		int[] segmentCrossedCounts = new int[4];
 		segmentCrossedCounts[0] = 0;
@@ -211,10 +227,14 @@ public class Vehicles {
 		return phaseWaitingTime + cycleWaitingTime;
 	}
 	
+	//Simple getter for vehicle count value
+	//Useful to phases class also
 	public int getVehicleCount() {
 		return vehiclesHMap.size();
 	}
 	
+	//Simple getter for emission rate sum
+	//Usedul to phases class in producing total CO2 estimate
 	public float getEmissionRateSum() {
 		float emissionRateSum = 0;
 		for(Vehicle vehicle : vehiclesHMap.values()) {
