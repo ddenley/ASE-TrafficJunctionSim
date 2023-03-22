@@ -155,9 +155,9 @@ public class Vehicle {
 		}	
 		this.status = status;
 		
-		//Convert segment to appropriate format
+		//Convert segment to appropriate format232
 		segment = segment.toUpperCase();
-		//Check that segment is of an allowed type
+		//Check that segment is of an allowed types
 		if(!this.allowedSegments.contains(segment)) {
 			throw new IllegalArgumentException("Invalid segment: " + segment);
 		}	
@@ -167,7 +167,7 @@ public class Vehicle {
 		this.phaseVehicleTurn = 0;
 	}
 	
-	//Method for determining allocation in an eight phase layouts
+	//Method for determining allocation in an eight phase layouts2333
 	public String getEightPhaseAllocation() {
 		//Phase determined by direction and segment
 		if (this.segment.equals("S1")) {
