@@ -7,9 +7,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import JunctionSim.GUIMain;
-import JunctionSim.InvalidFileFormatException;
-import JunctionSim.ReadCSV;
+import exceptions.InvalidFileFormatException;
+import utility.ReadCSV;
+import view.GUIMain;
 /**
  * @author Daniel Denley
  *

@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import JunctionSim.Vehicle;
+import model.Vehicle;
 
 /**
  * @author Daniel Denley and Ahmad

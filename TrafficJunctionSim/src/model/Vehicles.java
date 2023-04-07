@@ -1,6 +1,11 @@
-package JunctionSim;
+package model;
 
 import java.util.HashMap;
+import java.util.List;
+
+import exceptions.DuplicateVehicleIDException;
+import utility.ReadCSV;
+import view.GUIMain;
 
 import java.util.ArrayList;
 
@@ -9,6 +14,8 @@ import java.util.ArrayList;
  *
  */
 public class Vehicles {
+	//List of observers for this model
+	private List <GUIMain> observers;
 	
 	//Vehicles object holds a hashmap of all vehicles - efficiently accessed via their key
 	//Hash map implementation as during simulation popping of vehicle keys from phase queues allows efficient updating
@@ -20,6 +27,7 @@ public class Vehicles {
 	//Sets header variable for GUI from csv
 	//Populates hash map with values from csv
 	public Vehicles(String vehiclesCSVFile){
+		observers = new ArrayList<>();
 		Object[] header_values = ReadCSV.getHeaderValues(vehiclesCSVFile);
 		String[] header = (String[]) header_values[0];
 		ArrayList<String[]> values = (ArrayList<String[]>) header_values[1];
@@ -84,6 +92,7 @@ public class Vehicles {
 			throw new DuplicateVehicleIDException(v.getVehicleID());
 		}
 		this.vehiclesHMap.putIfAbsent(v.getVehicleID(), v);
+		notifyObservers();
 	}
 	
 	//Getter for vehicles hash map
@@ -246,5 +255,17 @@ public class Vehicles {
 		}
 		return emissionRateSum;
 	}
-	//TODO: Sorting methods?
+	
+	//Methods for subject/observer pattern
+	public void addObserver(GUIMain observer) {
+		observers.add(observer);
+	}
+	public void removerObserver(GUIMain observer) {
+		observers.remove(observer);
+	}
+	private void notifyObservers() {
+		for(GUIMain observer : observers) {
+			observer.modelUpdated();
+		}
+	}
 }

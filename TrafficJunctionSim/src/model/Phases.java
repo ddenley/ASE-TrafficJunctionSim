@@ -1,4 +1,4 @@
-package JunctionSim;
+package model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,11 +11,19 @@ import java.util.Queue;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import exceptions.InvalidFileFormatException;
+import utility.ReadCSV;
+//Imported so I can add it as an observer
+import view.GUIMain;
+
 /**
  * @author Daniel Denley
  *
  */
 public class Phases {
+	//List of observers for this model
+	private List <GUIMain> observers;
+	
 	
 	// Hash map will have phase string as ID and a phase object which holds a queue of vehicles
 	private HashMap<String, Phase> phasesHMap = new HashMap<String, Phase>();
@@ -32,6 +40,7 @@ public class Phases {
 	//Phases constructor takes reference to vehicles for queue population
 	//Reference to init csv file for phase durations and names
 	public Phases(Vehicles vehicles, String intersectionCSVFile) {
+		observers = new ArrayList<>();
 		this.vehicles = vehicles;
 		// First read intersection.csv to create phasesHMap and set phaseHeaders
 		Object[] header_values = ReadCSV.getHeaderValues(intersectionCSVFile);
@@ -41,6 +50,10 @@ public class Phases {
 		populateFromCSV(values);
 		//Now populate each phase queue from the vehicles hash map for initial init
 		populatePhaseQueuesFromHashTable();
+	}
+	
+	public HashMap<String, Phase> getPhasesHmap() {
+		return this.phasesHMap;
 	}
 	
 	//Method can throw an unhandled InvalidFileFormatException to ensure we do not enter a weird state
@@ -98,6 +111,7 @@ public class Phases {
 		String vehicle_key = v.getVehicleID();
 		Phase phase = this.phasesHMap.get(phase_key);
 		phase.addQueue(vehicle_key);
+		notifyObservers();
 	}
 	
 	public String[] getPhaseHeaders() {
@@ -314,5 +328,18 @@ public class Phases {
 		float CO2Estimate = ((avgVehicleWaitTime / 60) * avgEmissionRate * vehicles.getVehicleCount()) / 1000;
 		//System.out.println(CO2Estimate);
 		return CO2Estimate;
+	}
+	
+	//Methods for subject/observer pattern
+	public void addObserver(GUIMain observer) {
+		observers.add(observer);
+	}
+	public void removerObserver(GUIMain observer) {
+		observers.remove(observer);
+	}
+	private void notifyObservers() {
+		for(GUIMain observer : observers) {
+			observer.modelUpdated();
+		}
 	}
 }

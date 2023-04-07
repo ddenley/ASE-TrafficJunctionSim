@@ -1,4 +1,4 @@
-package JunctionSim;
+package utility;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
