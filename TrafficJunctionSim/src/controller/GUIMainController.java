@@ -115,11 +115,9 @@ public class GUIMainController {
 			}
 			else if ("btnStart".equals(action)) {
 				System.out.println("Start");
-				SignalController scontroller = new SignalController();
-				LinkedList<Object[][]> segments = scontroller.createSegmentList(phaseModel.getPhasesHmap());
-				for (Object[][] segment : segments) {
-					System.out.println(Arrays.deepToString(segment));
-				}
+				TrafficController tcontroller = new TrafficController(phaseModel);
+				tcontroller.iterateSegments();
+				
 			}
 		}
 	}
