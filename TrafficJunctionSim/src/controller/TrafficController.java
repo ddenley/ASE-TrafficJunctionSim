@@ -2,12 +2,22 @@ package controller;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import model.Phase;
 import model.Phases;
+import view.GUIMain;
+
+//Notifies main controller of changes
 
 public class TrafficController {
+		private GUIMainController controller;
+		
 		//Segments as linked list
 		private LinkedList<Object[][]> segments;
 		//Active phases
@@ -20,7 +30,8 @@ public class TrafficController {
 		private int segmentIndex;
 		
 		//Constructor
-		public TrafficController(Phases phases) {
+		public TrafficController(Phases phases, GUIMainController controller) {
+			this.controller = controller;
 			this.phases = phases;
 			this.segments = createSegmentList(phases.getPhasesHmap());
 			segmentIndex = 0;
@@ -66,9 +77,47 @@ public class TrafficController {
 			this.activePhaseTwoDuration = (float)segment[1][1];
 		}
 		
-		public void iterateSegments() {
-			System.out.println(activePhaseOne);
-			System.out.println(activePhaseTwo);
-			System.out.println(activePhaseOneDuration);
+		public void phaseLights() {
+			//Get phase durations
+			float p1Duration = this.activePhaseOneDuration;
+			long p1DurationMilli = (long)(p1Duration * 1000);
+			float p2Duration = this.activePhaseTwoDuration;
+			long p2DurationMilli = (long)(p2Duration * 1000);
+
+			AtomicBoolean p1Active = new AtomicBoolean(true);
+			ScheduledExecutorService schedulerp1 = Executors.newScheduledThreadPool(1);
+			schedulerp1.schedule(() -> p1Active.set(false), p1DurationMilli, TimeUnit.MILLISECONDS);
+			
+			AtomicBoolean p2Active = new AtomicBoolean(true);
+			ScheduledExecutorService schedulerp2 = Executors.newScheduledThreadPool(1);
+			schedulerp1.schedule(() -> p2Active.set(false), p2DurationMilli, TimeUnit.MILLISECONDS);
+			
+			
+			while(true) {
+				if(!p1Active.get()) {
+					this.activePhaseOne = null;
+					notifyController();
+				}
+				if(!p2Active.get()) {
+					this.activePhaseTwo = null;
+					notifyController();
+				}
+				if(!p1Active.get() && !p2Active.get()) {
+					break;
+				}
+				try {
+	                Thread.sleep(200);
+	            } catch (InterruptedException e) {
+	                e.printStackTrace();
+	            }
+			}
+
+	        schedulerp1.shutdown();
+	        schedulerp2.shutdown();
+	        System.out.println("CHANGING SEGMENT");
+		}
+		
+		private void notifyController() {
+			controller.trafficControllerUpdated();
 		}
 }

@@ -18,6 +18,7 @@ public class GUIMainController {
 	private Phases phaseModel;
 	private Vehicles vehiclesModel;
 	private GUIMain view;
+	private TrafficController trafficController;
 	
 	
 	public GUIMainController(Phases phaseModel, Vehicles vehiclesModel, GUIMain view) {
@@ -38,6 +39,8 @@ public class GUIMainController {
 		view.setVisible(true);
 		//Provide view with controller so it can call GUI update methods
 		view.controller = this;
+		//New traffic controller
+		this.trafficController = new TrafficController(phaseModel, this);
 	}
 	
 	//Update methods for tables
@@ -115,8 +118,7 @@ public class GUIMainController {
 			}
 			else if ("btnStart".equals(action)) {
 				System.out.println("Start");
-				TrafficController tcontroller = new TrafficController(phaseModel);
-				tcontroller.iterateSegments();
+				trafficController.phaseLights();
 				
 			}
 		}
@@ -172,5 +174,10 @@ public class GUIMainController {
 		ProduceReport.createReport(lines);
 		System.exit(0);
 	}
+	
+	//Use controller to update GUI
+		public void trafficControllerUpdated() {
+			System.out.println("Update from traffic");
+		}
 	
 }

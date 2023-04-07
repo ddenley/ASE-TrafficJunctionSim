@@ -3,6 +3,7 @@ package JunctionSim;
 import java.awt.EventQueue;
 
 import controller.GUIMainController;
+import controller.TrafficController;
 import model.Phases;
 import model.Vehicles;
 import view.GUIMain;
@@ -21,6 +22,5 @@ public class JunctionSim {
 		Phases phasesModel = new Phases(vehiclesModel, intersectionCSVFile);
 		GUIMain view = new GUIMain();
 		GUIMainController controller = new GUIMainController(phasesModel, vehiclesModel, view);
-
 	}
 }
