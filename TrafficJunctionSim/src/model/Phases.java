@@ -358,7 +358,18 @@ public class Phases {
 	
 	//Notify all vehicles in the phase they are active
 	public void notifyVehicles(String phaseID) {
-		//Get queue associated with phase
-		
+		//Get vehicle ID queue associated with phaseID
+		Queue<String> phaseQueue = phasesHMap.get(phaseID).getVehicleKeysQueue();
+		//Get the vehicles hash map
+		HashMap<String, Vehicle> vehiclesHashMap = vehicles.getVehiclesHashMap();
+		//Notift each vehicle
+		for(String vID : phaseQueue) {
+			//Get vehicle object
+			Vehicle vehicle = vehiclesHashMap.get(vID);
+			//Notify vehicle
+			synchronized (vehicle.getVehicleMonitor()) {
+		        vehicle.getVehicleMonitor().notifyAll();
+		    }
+		}
 	}
 }

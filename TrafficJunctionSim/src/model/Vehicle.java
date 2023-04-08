@@ -293,7 +293,13 @@ public class Vehicle implements Runnable{
 			}
 			
 			while(isActive.get()) {
-				System.out.println(this.vehicleID);
+				System.out.println(this.vehicleID + "		" + this.segment);
+				try {
+					Thread.sleep(900);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				if (Thread.interrupted()) {
 					System.out.println("INTERRUPT");
 					return;

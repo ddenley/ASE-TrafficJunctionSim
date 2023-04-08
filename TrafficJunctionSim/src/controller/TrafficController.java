@@ -1,5 +1,6 @@
 package controller;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -51,17 +52,19 @@ public class TrafficController implements Runnable{
 			//Converts HMAP phases to segments - 2d array containing phase names and durations
 			//This is the linked list to be iterated over
 			LinkedList<Object[][]> segments = new LinkedList<Object[][]>();
+			String[] phaseOrder = {"P6", "P1", "P4", "P7", "P2", "P5", "P8", "P3"};
+			//Get phase durations
+			float[] phaseDurations = new float[8];
+			for (Map.Entry<String, Phase> entry : phasesHMap.entrySet()) {
+				String phaseName = entry.getKey();
+				float phaseDuration = entry.getValue().getPhaseDuration();
+				int phaseOrderIndex = Arrays.asList(phaseOrder).indexOf(phaseName);
+				phaseDurations[phaseOrderIndex] = phaseDuration;
+			}
 			int i = 0;
 			Object[][] segment = new Object[2][2];
-			for (Map.Entry<String, Phase> entry : phasesHMap.entrySet()) {
-				segment[i][0] = entry.getKey();
-				segment[i][1] = entry.getValue().getPhaseDuration();
-				i++;
-				if (i > 1) {
-					i = 0;
-					segments.add(segment);
-					segment = new Object[2][2];
-				}
+			while (i <= 7) {
+				
 			}
 			return segments;
 		}
@@ -105,6 +108,7 @@ public class TrafficController implements Runnable{
 				if(!p1Active.get()) {
 					if (!p1Notified) {
 						p1Notified = true;
+						notifyVehicles(activePhaseOne);
 						this.activePhaseOne = null;
 						notifyController();
 					}
@@ -112,6 +116,7 @@ public class TrafficController implements Runnable{
 				if(!p2Active.get()) {
 					if(!p2Notified) {
 						p2Notified = true;
+						notifyVehicles(activePhaseTwo);
 						this.activePhaseTwo = null;
 						notifyController();
 					}
@@ -133,16 +138,18 @@ public class TrafficController implements Runnable{
 		
 		public void iterateSegments() {
 			while (trafficControllerActive) {
-				//Notify vehicles in queues they are active
-				
+				notifyVehicles(activePhaseOne);
+				notifyVehicles(activePhaseTwo);
 				phaseLights();
 				updateSegmentIndex();
 				updateActivePhaseInfo();
 			}
 		}
 		
-		private void notifyVehiclesActive() {
-			
+		private void notifyVehicles(String phase) {
+			//phases.notifyVehicles(phase);
+			System.out.println(activePhaseOne);
+			System.out.println(activePhaseTwo);
 		}
 		
 		public String[] getActivePhases() {
