@@ -167,7 +167,7 @@ public class Vehicle {
 		this.phaseVehicleTurn = 0;
 	}
 	
-	//Method for determining allocation in an eight phase layouts
+	//Method for determining allocation in an eight phase layout
 	public String getEightPhaseAllocation() {
 		//Phase determined by direction and segment
 		if (this.segment.equals("S1")) {
