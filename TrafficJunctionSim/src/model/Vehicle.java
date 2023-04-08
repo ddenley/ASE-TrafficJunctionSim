@@ -3,6 +3,7 @@ package model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,7 +11,7 @@ import java.util.regex.Pattern;
  * @author Daniel Denley
  *
  */
-public class Vehicle {
+public class Vehicle implements Runnable{
 	private String vehicleID;
 	private String type;
 	private float crossingTime;
@@ -19,6 +20,11 @@ public class Vehicle {
 	private float emissionRate;
 	private String status;
 	private String segment;
+	
+	//Monitor object for thread communication and syncronization
+	private final Object vehicleMonitor;
+	
+	private final AtomicBoolean isActive = new AtomicBoolean(false);
 	
 	//TODO: These variables are for implementation in STAGE 2 can ignore
 	//This variable will hold how many cycles occurred before this vehicle crossed
@@ -165,6 +171,7 @@ public class Vehicle {
 		
 		this.cyclesBeforeCross = 0;
 		this.phaseVehicleTurn = 0;
+		this.vehicleMonitor = new Object();
 	}
 	
 	//Method for determining allocation in an eight phase layout
@@ -261,5 +268,37 @@ public class Vehicle {
 	//Also need a setter for status	
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	
+	//Get vehicle monitor
+	public Object getVehicleMonitor() {
+		return vehicleMonitor;
+	}
+	
+	public void toggleActive() {
+		this.isActive.set(!isActive.get());
+	}
+
+	@Override
+	public void run() {
+		while (true) {
+			synchronized (vehicleMonitor){
+				try {
+					vehicleMonitor.wait();
+					toggleActive();
+				}
+				catch(InterruptedException e) {
+					return;
+				}
+			}
+			
+			while(isActive.get()) {
+				System.out.println(this.vehicleID);
+				if (Thread.interrupted()) {
+					System.out.println("INTERRUPT");
+					return;
+				}
+			}
+		}
 	}
 }

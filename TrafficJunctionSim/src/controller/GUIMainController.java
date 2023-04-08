@@ -2,8 +2,10 @@ package controller;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 
@@ -19,6 +21,9 @@ public class GUIMainController {
 	private Vehicles vehiclesModel;
 	private GUIMain view;
 	private TrafficController trafficController;
+	private boolean tControllerMade;
+	private Thread trafficControllerThread;
+	private List<Thread> vehicleThreads;
 	
 	
 	public GUIMainController(Phases phaseModel, Vehicles vehiclesModel, GUIMain view) {
@@ -34,6 +39,7 @@ public class GUIMainController {
 		view.addBtnAddVehicleListener(actionHandler);
 		view.addBtnClearVehicleInputListener(actionHandler);
 		view.addBtnStartListener(actionHandler);
+		view.addBtnStopListener(actionHandler);
 		//Init the view gui
 		updateGUI();
 		view.setVisible(true);
@@ -41,6 +47,18 @@ public class GUIMainController {
 		view.controller = this;
 		//New traffic controller
 		this.trafficController = new TrafficController(phaseModel, this);
+		this.tControllerMade = false;
+		//Create vehicle threads and store them here
+		this.vehicleThreads = new ArrayList();
+		initVehiclesThreads();
+	}
+	
+	private void initVehiclesThreads() {
+		for(Vehicle vehicle : vehiclesModel.getVehiclesHashMap().values()) {
+			Thread vehicle_thread = new Thread(vehicle);
+			vehicleThreads.add(vehicle_thread);
+			vehicle_thread.start();
+		}
 	}
 	
 	//Update methods for tables
@@ -74,6 +92,16 @@ public class GUIMainController {
 	}
 	private void updateAddVehicleTableToEmpty() {
 		view.setTableAddVehicleToEmpty();
+	}
+	private void updateActivePhasesTable() {
+		String[] activePhases = trafficController.getActivePhases();
+		Object[][] activePhasesContent = new Object[2][1];
+		int i = 0;
+		for (String phaseName : activePhases) {
+			activePhasesContent[i][0] = phaseName;
+			i++;
+		}
+		view.setTableActivePhases(activePhasesContent);
 	}
 	//Update methods for labels
 	private void updateCO2PerMinuteLabel() {
@@ -118,8 +146,21 @@ public class GUIMainController {
 			}
 			else if ("btnStart".equals(action)) {
 				System.out.println("Start");
-				trafficController.phaseLights();
-				
+				//Start traffic controller thread
+				if (!tControllerMade) {
+					tControllerMade = true;
+					trafficControllerThread = new Thread(trafficController);
+					trafficControllerThread.start();
+				}
+				else {
+					System.out.println("Already started");
+				}
+			}
+			//TODO: FIX IF TIME ALLOWS
+			else if ("btnStop".equals(action)) {
+				System.out.println("Start");
+				trafficController.endSimulation();
+				trafficControllerThread.interrupt();
 			}
 		}
 	}
@@ -177,7 +218,8 @@ public class GUIMainController {
 	
 	//Use controller to update GUI
 		public void trafficControllerUpdated() {
-			System.out.println("Update from traffic");
+			System.out.println("Update from traffic controller");
+			updateActivePhasesTable();
 		}
 	
 }

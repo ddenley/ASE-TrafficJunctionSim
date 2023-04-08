@@ -40,6 +40,7 @@ public class GUIMain extends JFrame{
 	private JButton btnAddVehicle;
 	private JButton btnClearVehicleInput;
 	private JButton btnStart;
+	private JButton btnStop;
 	
 	private JPanel contentPane;
 	private JTable tableVehicles;
@@ -47,6 +48,7 @@ public class GUIMain extends JFrame{
 	private JTable tablePhaseAllocation;
 	private JTable tableStatistics;
 	private JTable tableAddVehicle;
+	private JTable tableActivePhases;
 	
 	private JLabel lblCO2PerMinute;
 	private JLabel lblCO2Estimate;
@@ -185,13 +187,32 @@ public class GUIMain extends JFrame{
 		contentPane.add(lblCO2Estimate);
 		
 		btnStart = new JButton("Start");
-		btnStart.setBounds(836, 597, 89, 23);
+		btnStart.setBounds(785, 597, 89, 23);
 		contentPane.add(btnStart);
+		
+		JLabel lblActivePhases = new JLabel("Active Phases");
+		lblActivePhases.setHorizontalAlignment(SwingConstants.CENTER);
+		lblActivePhases.setFont(new Font("Verdana", Font.BOLD, 15));
+		lblActivePhases.setBounds(512, 365, 171, 14);
+		contentPane.add(lblActivePhases);
+		
+		tableActivePhases = new JTable();
+		tableActivePhases.setFillsViewportHeight(true);
+		tableActivePhases.setEnabled(false);
+		tableActivePhases.setBounds(540, 391, 114, 121);
+		contentPane.add(tableActivePhases);
+		
+		btnStop = new JButton("Stop");
+		btnStop.setActionCommand("btnStart");
+		btnStop.setBounds(896, 597, 89, 23);
+		contentPane.add(btnStop);
 		
 		btnExit.setActionCommand("btnExit");
 		btnAddVehicle.setActionCommand("btnAddVehicle");
 		btnClearVehicleInput.setActionCommand("btnClearVehicleInput");
 		btnStart.setActionCommand("btnStart");
+		btnStop.setActionCommand("btnStop");
+		
 		
 	}
 	
@@ -223,6 +244,11 @@ public class GUIMain extends JFrame{
 		TableModel phaseStatisticsTableModel = new DefaultTableModel(statisticsContent, header);
 		this.tableStatistics.setModel(phaseStatisticsTableModel);
 	}
+	public void setTableActivePhases(Object[][] activePhasesContent) {
+		String[] header = {"Phases"};
+		TableModel activePhasesTableModel = new DefaultTableModel(activePhasesContent, header);
+		this.tableActivePhases.setModel(activePhasesTableModel);
+	}
 	public void setLblCO2PerMinute(String co2PerMin) {
 		lblCO2PerMinute.setText(co2PerMin);
 	}
@@ -249,6 +275,9 @@ public class GUIMain extends JFrame{
 	}
 	public void addBtnStartListener(ActionListener al) {
 		btnStart.addActionListener(al);
+	}
+	public void addBtnStopListener(ActionListener al) {
+		btnStop.addActionListener(al);
 	}
 	
 	

@@ -27,6 +27,8 @@ public class Phases {
 	
 	// Hash map will have phase string as ID and a phase object which holds a queue of vehicles
 	private HashMap<String, Phase> phasesHMap = new HashMap<String, Phase>();
+	//Collection of vehicle monitor objects for each vehicle
+	//private HashMap<String, Queue<Object>> phaseMonitorQueues = new HashMap<String, Queue<Object>>();
 	private String[] phaseHeaders;
 	
 	//Holds a reference to the vehicles object for population of its queues
@@ -56,6 +58,10 @@ public class Phases {
 		return this.phasesHMap;
 	}
 	
+//	public HashMap<String, Queue<Object>> getVehicleMonitorsQueue(){
+//		return this.phaseMonitorQueues;
+//	}
+	
 	//Method can throw an unhandled InvalidFileFormatException to ensure we do not enter a weird state
 	//Invalid files include if phase number is invalid
 	//Invalid phase paramaters throw from phase constructor and exit gracefully here
@@ -71,6 +77,8 @@ public class Phases {
 					Phase phase = new Phase(phase_duration);
 					//Add phase to hash map
 					this.phasesHMap.putIfAbsent(phase_name, phase);
+					//Add monitors
+					//phaseMonitorQueues.put(phase_name, new LinkedList<>());
 				}
 				catch (IllegalArgumentException ae) {
 					System.out.println(ae.getMessage());
@@ -93,6 +101,7 @@ public class Phases {
 	private void populatePhaseQueuesFromHashTable() {
 		for (Map.Entry<String, Vehicle> entry : this.vehicles.getVehiclesHashMap().entrySet())
         {
+			//Populates each queue accordingly
             String key = entry.getKey();
             Vehicle vehicle = entry.getValue();
             
@@ -101,6 +110,8 @@ public class Phases {
             //Get correct phase object and place vehicle ID into queue
             Phase phase = this.phasesHMap.get(vehiclePhaseAllocation);
             phase.addQueue(key);
+            Object vehicleMonitor = vehicle.getVehicleMonitor();
+            //phaseMonitorQueues.get(vehiclePhaseAllocation).add(vehicleMonitor);
         }
 	}
 	
@@ -111,6 +122,8 @@ public class Phases {
 		String vehicle_key = v.getVehicleID();
 		Phase phase = this.phasesHMap.get(phase_key);
 		phase.addQueue(vehicle_key);
+		Object vehicleMonitor = v.getVehicleMonitor();
+		//phaseMonitorQueues.get(phase_key).add(vehicleMonitor);
 		notifyObservers();
 	}
 	
@@ -341,5 +354,11 @@ public class Phases {
 		for(GUIMain observer : observers) {
 			observer.modelUpdated();
 		}
+	}
+	
+	//Notify all vehicles in the phase they are active
+	public void notifyVehicles(String phaseID) {
+		//Get queue associated with phase
+		
 	}
 }

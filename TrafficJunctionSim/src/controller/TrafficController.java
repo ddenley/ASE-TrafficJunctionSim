@@ -15,7 +15,7 @@ import view.GUIMain;
 
 //Notifies main controller of changes
 
-public class TrafficController {
+public class TrafficController implements Runnable{
 		private GUIMainController controller;
 		
 		//Segments as linked list
@@ -28,6 +28,11 @@ public class TrafficController {
 		private Phases phases;
 		//Index of active segment
 		private int segmentIndex;
+		//TrafficController active boolean
+		private boolean trafficControllerActive;
+		
+		ScheduledExecutorService schedulerp1;
+		ScheduledExecutorService schedulerp2;
 		
 		//Constructor
 		public TrafficController(Phases phases, GUIMainController controller) {
@@ -36,6 +41,7 @@ public class TrafficController {
 			this.segments = createSegmentList(phases.getPhasesHmap());
 			segmentIndex = 0;
 			updateActivePhaseInfo();
+			trafficControllerActive = true;
 		}
 		
 		//Method bundles phases into 2d array and creates a linked list
@@ -61,7 +67,7 @@ public class TrafficController {
 		}
 		
 		private void updateSegmentIndex() {
-			if (segmentIndex > segments.size() -1) {
+			if (segmentIndex >= segments.size() -1) {
 				segmentIndex = 0;
 			}
 			else {
@@ -78,6 +84,7 @@ public class TrafficController {
 		}
 		
 		public void phaseLights() {
+			notifyController();
 			//Get phase durations
 			float p1Duration = this.activePhaseOneDuration;
 			long p1DurationMilli = (long)(p1Duration * 1000);
@@ -85,22 +92,29 @@ public class TrafficController {
 			long p2DurationMilli = (long)(p2Duration * 1000);
 
 			AtomicBoolean p1Active = new AtomicBoolean(true);
-			ScheduledExecutorService schedulerp1 = Executors.newScheduledThreadPool(1);
+			schedulerp1 = Executors.newScheduledThreadPool(1);
 			schedulerp1.schedule(() -> p1Active.set(false), p1DurationMilli, TimeUnit.MILLISECONDS);
 			
 			AtomicBoolean p2Active = new AtomicBoolean(true);
-			ScheduledExecutorService schedulerp2 = Executors.newScheduledThreadPool(1);
+			schedulerp2 = Executors.newScheduledThreadPool(1);
 			schedulerp1.schedule(() -> p2Active.set(false), p2DurationMilli, TimeUnit.MILLISECONDS);
 			
-			
+			boolean p1Notified = false;
+			boolean p2Notified = false;
 			while(true) {
 				if(!p1Active.get()) {
-					this.activePhaseOne = null;
-					notifyController();
+					if (!p1Notified) {
+						p1Notified = true;
+						this.activePhaseOne = null;
+						notifyController();
+					}
 				}
 				if(!p2Active.get()) {
-					this.activePhaseTwo = null;
-					notifyController();
+					if(!p2Notified) {
+						p2Notified = true;
+						this.activePhaseTwo = null;
+						notifyController();
+					}
 				}
 				if(!p1Active.get() && !p2Active.get()) {
 					break;
@@ -117,7 +131,37 @@ public class TrafficController {
 	        System.out.println("CHANGING SEGMENT");
 		}
 		
+		public void iterateSegments() {
+			while (trafficControllerActive) {
+				//Notify vehicles in queues they are active
+				
+				phaseLights();
+				updateSegmentIndex();
+				updateActivePhaseInfo();
+			}
+		}
+		
+		private void notifyVehiclesActive() {
+			
+		}
+		
+		public String[] getActivePhases() {
+			String[] activePhases = {this.activePhaseOne, this.activePhaseTwo};
+			return activePhases;
+		}
+		
 		private void notifyController() {
 			controller.trafficControllerUpdated();
+		}
+		
+		public void endSimulation() {
+			trafficControllerActive = false;
+			schedulerp1.shutdown();
+			schedulerp2.shutdown();
+		}
+
+		@Override
+		public void run() {
+			iterateSegments();
 		}
 }
