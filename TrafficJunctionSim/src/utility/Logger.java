@@ -6,13 +6,24 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.LinkedList;
+import java.util.Queue;
 
-public class Logger {
+public class Logger implements Runnable{
     // The instance variable holds the single instance of the Logger class
     private static Logger instance= null;
 
     // The writer variable is used to write log messages to a file
     private PrintWriter writer;
+    
+    //Queue for log messages
+    private Queue<String> logMessages;
+    
+    private final Object lock = new Object();
+    
+    //Volatile forces boolean to main memory - prevents cached versions to be used
+    //Important as this is the thread termination condition
+    private volatile boolean running;
 
     // The private constructor is called only once to create the single instance of the Logger class
     private Logger() {
@@ -26,6 +37,8 @@ public class Logger {
 
             // Create a PrintWriter object that wraps the BufferedWriter object
             writer = new PrintWriter(bw);
+            logMessages = new LinkedList<>();
+            running = true;
         } catch (IOException e) {
             //Auto-generated catch block If an exception occurs while creating the file writer, print the stack trace
             e.printStackTrace();
@@ -48,19 +61,20 @@ public class Logger {
         // If the instance variable is null, create a new instance of the Logger class
         if (instance == null) {
             instance = new Logger();
+            Thread loggerThread = new Thread(instance);
+            loggerThread.start();
         }
 
         // Return the single instance of the Logger class
         return instance;
     }
 
-    // The log() method writes a log message to the log file
+    // The log() method adds message to queue
     public void log(String message) {
-        // Write the message to the log file using the PrintWriter object created in the constructor
-        writer.println(getDateTime() + " - " + message);
-
-        // Call flush() to ensure that the message is immediately written to the file
-        writer.flush();
+        synchronized (lock) {
+        	logMessages.add(message);
+        	lock.notify();
+        }
     }
     
     private static String getDateTime() {
@@ -72,7 +86,34 @@ public class Logger {
 
     // The close() method closes the PrintWriter object and the log file
     public void close() {
-        // Close the PrintWriter object
-        writer.close();
+        running = false;
+        synchronized (lock){
+        	lock.notify();
+        }
+    }
+    
+    @Override
+    public void run() {
+    	while(running) {
+    		String message = null;
+    		synchronized (lock) {
+    			if (!logMessages.isEmpty()) {
+    				message = logMessages.poll();
+    			}
+    			else {
+    				try {
+    					lock.wait();
+    				}
+    				catch (InterruptedException e) {
+    					e.printStackTrace();
+    				}
+    			}
+    		}
+    		if (message != null) {
+    			writer.println(getDateTime() + " - " + message);
+    			writer.flush();
+    		}
+    	}
+    	writer.close();
     }
 }
