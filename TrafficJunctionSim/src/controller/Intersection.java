@@ -4,25 +4,15 @@ import model.Vehicle;
 
 //This will be a shared resource and will have two instances - for each direction
 public class Intersection {
-	private String acceptingPhase;
-	private boolean isEmpty;
 	
-	private void getVehicle() {
-		
+	
+	public synchronized void enterIntersection(Vehicle vehicle) {
+		System.out.println("Entered " + vehicle.getVehicleID());
+		vehicle.setStatus("Crossing");
 	}
 	
-	
-	private synchronized void intersectionProccesor(Vehicle vehicle) {
-		isEmpty = false;
-		vehicle.setStatus("Crossing");
-		float crossingTime = vehicle.getCrossingTime();
-		long crossingTimeMilli = (long) (crossingTime * 1000);
-		try {
-			Thread.sleep(crossingTimeMilli);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public synchronized void exitIntersection(Vehicle vehicle) {
+		System.out.println("Crossed " + vehicle.getVehicleID());
 		vehicle.setStatus("Crossed");
 	}
 	

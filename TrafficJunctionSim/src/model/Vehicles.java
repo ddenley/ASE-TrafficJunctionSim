@@ -3,6 +3,7 @@ package model;
 import java.util.HashMap;
 import java.util.List;
 
+import controller.Intersection;
 import exceptions.DuplicateVehicleIDException;
 import utility.ReadCSV;
 import view.GUIMain;
@@ -22,11 +23,13 @@ public class Vehicles {
 	private HashMap<String, Vehicle> vehiclesHMap = new HashMap<String, Vehicle>();
 	//Header variable used in GUI
 	private String[] vehicleHeaders;
+	private Intersection intersection;
 	
 	//Constructor reads from csv file
 	//Sets header variable for GUI from csv
 	//Populates hash map with values from csv
-	public Vehicles(String vehiclesCSVFile){
+	public Vehicles(String vehiclesCSVFile, Intersection intersection){
+		this.intersection = intersection;
 		observers = new ArrayList<>();
 		Object[] header_values = ReadCSV.getHeaderValues(vehiclesCSVFile);
 		String[] header = (String[]) header_values[0];
@@ -76,7 +79,8 @@ public class Vehicles {
 					vehicleParams[4], //length
 					vehicleParams[5], //emissionRate
 					vehicleParams[6], //status
-					vehicleParams[7] //segment
+					vehicleParams[7], //segment
+					intersection
 					);
 			return vehicle;
 		}

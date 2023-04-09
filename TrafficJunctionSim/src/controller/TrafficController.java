@@ -63,8 +63,19 @@ public class TrafficController implements Runnable{
 			}
 			int i = 0;
 			Object[][] segment = new Object[2][2];
-			while (i <= 7) {
-				
+			int j = 0;
+			while (i < phaseOrder.length) {
+				segment[j][0] = phaseOrder[i];
+				segment[j][1] = phaseDurations[i];
+				j++;
+				if (j != 0) {
+					if((j % 2) == 0) {
+						j = 0;
+						segments.add(segment);
+						segment = new Object[2][2];
+					}
+				}
+				i++;
 			}
 			return segments;
 		}
@@ -108,6 +119,7 @@ public class TrafficController implements Runnable{
 				if(!p1Active.get()) {
 					if (!p1Notified) {
 						p1Notified = true;
+						System.out.println("Deactivate " + activePhaseOne);
 						notifyVehicles(activePhaseOne);
 						this.activePhaseOne = null;
 						notifyController();
@@ -116,6 +128,7 @@ public class TrafficController implements Runnable{
 				if(!p2Active.get()) {
 					if(!p2Notified) {
 						p2Notified = true;
+						System.out.println("Deactivate " + activePhaseTwo);
 						notifyVehicles(activePhaseTwo);
 						this.activePhaseTwo = null;
 						notifyController();
@@ -125,7 +138,7 @@ public class TrafficController implements Runnable{
 					break;
 				}
 				try {
-	                Thread.sleep(200);
+	                Thread.sleep(100);
 	            } catch (InterruptedException e) {
 	                e.printStackTrace();
 	            }
@@ -147,9 +160,7 @@ public class TrafficController implements Runnable{
 		}
 		
 		private void notifyVehicles(String phase) {
-			//phases.notifyVehicles(phase);
-			System.out.println(activePhaseOne);
-			System.out.println(activePhaseTwo);
+			phases.notifyVehicles(phase);
 		}
 		
 		public String[] getActivePhases() {

@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import exceptions.DuplicateVehicleIDException;
 import model.Phases;
@@ -67,6 +68,7 @@ public class GUIMainController {
 		String[] vehiclesHeader = vehiclesModel.getVehicleHeaders();
 		Object[][] vehiclesContents = vehiclesModel.getVehicles2DArray();
 		//Set in view
+		System.out.println("TEST");
 		view.setTableVehicles(vehiclesHeader, vehiclesContents);
 	}
 	private void updatePhasesTable() {
@@ -93,7 +95,7 @@ public class GUIMainController {
 	private void updateAddVehicleTableToEmpty() {
 		view.setTableAddVehicleToEmpty();
 	}
-	private void updateActivePhasesTable() {
+	private synchronized void updateActivePhasesTable() {
 		String[] activePhases = trafficController.getActivePhases();
 		Object[][] activePhasesContent = new Object[2][1];
 		int i = 0;
@@ -193,13 +195,20 @@ public class GUIMainController {
 	}
 	
 	public void updateGUI() {
-		System.out.println("Model changed");
-		updateVehiclesTable();
-		updatePhasesTable();
-		updatePhasesAllocationTable();
-		updateStatisticsTable();
-		updateCO2PerMinuteLabel();
-		updateCO2EstimateLabel();
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				System.out.println("Model changed");
+				updateVehiclesTable();
+				updatePhasesTable();
+				updatePhasesAllocationTable();
+				updateStatisticsTable();
+				updateCO2PerMinuteLabel();
+				updateCO2EstimateLabel();
+			}
+			
+		});
 	}
 	
 	private void exitFunction() {
@@ -220,6 +229,7 @@ public class GUIMainController {
 		public void trafficControllerUpdated() {
 			System.out.println("Update from traffic controller");
 			updateActivePhasesTable();
+			//updateVehiclesTable();
 		}
 	
 }

@@ -101,9 +101,12 @@ public class Phases {
 	private void populatePhaseQueuesFromHashTable() {
 		for (Map.Entry<String, Vehicle> entry : this.vehicles.getVehiclesHashMap().entrySet())
         {
+			
 			//Populates each queue accordingly
             String key = entry.getKey();
             Vehicle vehicle = entry.getValue();
+            
+            vehicle.providePhases(this);
             
             String vehiclePhaseAllocation = vehicle.getEightPhaseAllocation();
             
@@ -124,6 +127,7 @@ public class Phases {
 		phase.addQueue(vehicle_key);
 		Object vehicleMonitor = v.getVehicleMonitor();
 		//phaseMonitorQueues.get(phase_key).add(vehicleMonitor);
+		
 		notifyObservers();
 	}
 	
@@ -350,7 +354,7 @@ public class Phases {
 	public void removerObserver(GUIMain observer) {
 		observers.remove(observer);
 	}
-	private void notifyObservers() {
+	public void notifyObservers() {
 		for(GUIMain observer : observers) {
 			observer.modelUpdated();
 		}
@@ -362,14 +366,32 @@ public class Phases {
 		Queue<String> phaseQueue = phasesHMap.get(phaseID).getVehicleKeysQueue();
 		//Get the vehicles hash map
 		HashMap<String, Vehicle> vehiclesHashMap = vehicles.getVehiclesHashMap();
-		//Notift each vehicle
+		//Notify each vehicle
 		for(String vID : phaseQueue) {
 			//Get vehicle object
 			Vehicle vehicle = vehiclesHashMap.get(vID);
 			//Notify vehicle
 			synchronized (vehicle.getVehicleMonitor()) {
-		        vehicle.getVehicleMonitor().notifyAll();
+		        vehicle.toggleActive();
 		    }
 		}
 	}
+	
+	public synchronized boolean isVehicleNext(Vehicle vehicle) {
+		String phaseName = vehicle.getEightPhaseAllocation();
+		Phase phase = phasesHMap.get(phaseName);
+		if (phase.isEmpty()) {
+			return false;
+		}
+		return phase.peekQueue().equals(vehicle.getVehicleID());
+	}
+	
+	public synchronized void removeVehicle(Vehicle vehicle) {
+        String phaseName = vehicle.getEightPhaseAllocation();
+        Phase phase = phasesHMap.get(phaseName);
+        
+        if (phase.peekQueue().equals(vehicle.getVehicleID())) {
+            phase.popQueue();
+        }
+    }
 }

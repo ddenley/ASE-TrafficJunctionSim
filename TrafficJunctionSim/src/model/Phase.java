@@ -43,6 +43,14 @@ public class Phase {
 		return vehicleKeysQueue.poll();
 	}
 	
+	public String peekQueue() {
+		return vehicleKeysQueue.peek();
+	}
+	
+	public boolean isEmpty() {
+		return vehicleKeysQueue.isEmpty();
+	}
+	
 	//Getters
 	public float getPhaseDuration() {
 		return this.phaseDuration;

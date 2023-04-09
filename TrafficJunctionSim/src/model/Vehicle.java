@@ -7,6 +7,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import controller.Intersection;
+import view.GUIMain;
+
 /**
  * @author Daniel Denley
  *
@@ -20,6 +23,9 @@ public class Vehicle implements Runnable{
 	private float emissionRate;
 	private String status;
 	private String segment;
+	
+	//Shared resource intersection
+	private final Intersection intersection;
 	
 	//Monitor object for thread communication and syncronization
 	private final Object vehicleMonitor;
@@ -42,12 +48,16 @@ public class Vehicle implements Runnable{
 	//Variable for allowed vehicle segments
 	private final List<String> allowedSegments = Arrays.asList("S1", "S2", "S3", "S4");
 	
+	//Crossing time as milliseconds long
+	private long crossingTimeMilli;
+	private Phases phases;
+	
 	
 	//Constructor for vehicle object
 	//Throws illegal argument exceptions and responsible for casting inputs to correct data type
 	//Illegal argument exceptions are handled if vehicle is created from GUI
 	public Vehicle(String vehicleID, String type, String crossingTime, String direction,
-			String length, String emissionRate, String status, String segment){
+			String length, String emissionRate, String status, String segment, Intersection intersection){
 		
 		//Initial check all parameters are not empty
 		if (vehicleID == null || vehicleID == "") {
@@ -172,6 +182,12 @@ public class Vehicle implements Runnable{
 		this.cyclesBeforeCross = 0;
 		this.phaseVehicleTurn = 0;
 		this.vehicleMonitor = new Object();
+		this.intersection = intersection;
+		this.crossingTimeMilli = (long)(Float.parseFloat(crossingTime) * 1000);
+	}
+	
+	public void providePhases(Phases phases) {
+		this.phases = phases;
 	}
 	
 	//Method for determining allocation in an eight phase layout
@@ -268,6 +284,7 @@ public class Vehicle implements Runnable{
 	//Also need a setter for status	
 	public void setStatus(String status) {
 		this.status = status;
+		
 	}
 	
 	//Get vehicle monitor
@@ -276,35 +293,50 @@ public class Vehicle implements Runnable{
 	}
 	
 	public void toggleActive() {
-		this.isActive.set(!isActive.get());
-	}
+        synchronized (vehicleMonitor) {
+            isActive.set(!isActive.get());
+            vehicleMonitor.notifyAll();
+        }
+    }
 
+	
+	//NOTE: The run method below was implemented with the help of chat gpt
+	//I utilized this tool to help in understanding the syncronization for
+	//entering the intersection, the code is adapated and bug fixes implemented
+	//however for academic honesty I have included this note
 	@Override
-	public void run() {
-		while (true) {
-			synchronized (vehicleMonitor){
-				try {
-					vehicleMonitor.wait();
-					toggleActive();
-				}
-				catch(InterruptedException e) {
-					return;
-				}
-			}
-			
-			while(isActive.get()) {
-				System.out.println(this.vehicleID + "		" + this.segment);
-				try {
-					Thread.sleep(900);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				if (Thread.interrupted()) {
-					System.out.println("INTERRUPT");
-					return;
-				}
-			}
-		}
-	}
+    public void run() {
+        while (true) {
+            synchronized (vehicleMonitor) {
+                try {
+                    while (!isActive.get()) {
+                        vehicleMonitor.wait();
+                    }
+                } catch (InterruptedException e) {
+                    return;
+                }
+            }
+
+            while (isActive.get()) {
+                if(phases.isVehicleNext(this)) {
+                	try {
+                		intersection.enterIntersection(this);
+                		phases.notifyObservers();
+                		Thread.sleep(crossingTimeMilli);
+                		intersection.exitIntersection(this);
+                		phases.notifyObservers();
+                		phases.removeVehicle(this);
+                	}
+                	catch(InterruptedException e) {
+                		e.printStackTrace();
+                	}
+                }
+                if (Thread.interrupted()) {
+                	System.out.println("Thread Interuppted");
+                	return;
+                }
+            }
+        }
+    }
+
 }
