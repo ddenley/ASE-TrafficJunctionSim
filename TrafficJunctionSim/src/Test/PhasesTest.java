@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
+import controller.Intersection;
 import exceptions.InvalidFileFormatException;
 import model.Phases;
 import model.Vehicle;
@@ -13,16 +14,17 @@ import model.Vehicles;
  *
  */
 class PhasesTest {
+	Intersection intersection = new Intersection();
 
 	@Test
 	final void testPhasesConstructorValidVehiclesValidCSVFile() {
-		Vehicles vehicles = new Vehicles("TestData/VehiclesTestCSVs/test_vehicles_valid.csv");
+		Vehicles vehicles = new Vehicles("TestData/VehiclesTestCSVs/test_vehicles_valid.csv", this.intersection);
 		Phases phases = new Phases(vehicles, "TestData/IntersectionTestCSVs/test_intersection_valid.csv");
 	}
 	
 	@Test
 	final void testPhasesConstructorValidVehiclesInvalidCSVFile() {
-		Vehicles vehicles = new Vehicles("TestData/VehiclesTestCSVs/test_vehicles_valid.csv");
+		Vehicles vehicles = new Vehicles("TestData/VehiclesTestCSVs/test_vehicles_valid.csv", this.intersection);
 		assertThrows(InvalidFileFormatException.class,
 				() -> new Phases(vehicles, "TestData/IntersectionTestCSVs/test_intersection_invalid.csv"));
 	}
@@ -31,15 +33,15 @@ class PhasesTest {
 	
 	@Test
 	final void testInsertVehicleQueue() {
-		Vehicle vehicle = new Vehicle("rrrIOp", "Car", "0.1", "Left", "20", "5", "Crossed", "S2");
-		Vehicles vehicles = new Vehicles("TestData/VehiclesTestCSVs/test_vehicles_valid.csv");
+		Vehicle vehicle = new Vehicle("rrrIOp", "Car", "0.1", "Left", "20", "5", "Crossed", "S2", this.intersection);
+		Vehicles vehicles = new Vehicles("TestData/VehiclesTestCSVs/test_vehicles_valid.csv", this.intersection);
 		Phases phases = new Phases(vehicles, "TestData/IntersectionTestCSVs/test_intersection_valid.csv");
 		phases.insertVehicleQueue(vehicle);	
 	}
 	
 	@Test
 	final void testGetCycleTime() {
-		Vehicles vehicles = new Vehicles("TestData/VehiclesTestCSVs/test_vehicles_valid.csv");
+		Vehicles vehicles = new Vehicles("TestData/VehiclesTestCSVs/test_vehicles_valid.csv", this.intersection);
 		Phases phases = new Phases(vehicles, "TestData/IntersectionTestCSVs/test_intersection_valid.csv");
 		float actual = phases.getCycleTime();
 		float expected = 420;
