@@ -36,7 +36,7 @@ public class Vehicle implements Runnable{
 	private Vehicle vehicleInfront;
 	private float distanceTravelled;
 	
-	private long timeCreated;
+	private long timeEntered;
 	private long waitingTime;
 	
 	//TODO: These variables are for implementation in STAGE 2 can ignore
@@ -193,18 +193,22 @@ public class Vehicle implements Runnable{
 		this.crossingTimeMilli = (long)(Float.parseFloat(crossingTime) * 1000);
 		this.distanceTravelled = 0;
 		this.vehicleMoved = new AtomicBoolean(false);
-		this.timeCreated = System.currentTimeMillis();
+		this.timeEntered = 0;
 		this.waitingTime = 0;
 	}
 	
 	//Waiting time is set once a vehicle has entered the intersection
+	public synchronized void setTimeEntered() {
+		this.timeEntered = System.currentTimeMillis();
+	}
 	//Going to be set as seconds
-	public void setWaitingTime() {
-		long waitingTimeMillis = System.currentTimeMillis() - timeCreated;
-		
+	public synchronized void setWaitingTime() {
+		//Some modifcations are made here to make it more accurate
+		float waitingTime = ((float)(System.currentTimeMillis() - timeEntered) / 1000.0f) - 1;
+		this.waitingTime = (long)waitingTime;
 	}
 	
-	public long getWaitingTime() {
+	public float getWaitingTime() {
 		return this.waitingTime;
 	}
 	
@@ -348,6 +352,7 @@ public class Vehicle implements Runnable{
 	//however for academic honesty I have included this note
 	@Override
     public void run() {
+		setTimeEntered();
         while (true) {
             synchronized (vehicleMonitor) {
                 try {

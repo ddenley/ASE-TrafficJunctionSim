@@ -10,10 +10,11 @@ public class Intersection {
 		System.out.println("Entered " + vehicle.getVehicleID());
 		vehicle.setStatus("Crossing");
 		vehicle.setVehicleMoved(true);
+		vehicle.setWaitingTime();
 	}
 	
 	public synchronized void exitIntersection(Vehicle vehicle) {
-		System.out.println("Crossed " + vehicle.getVehicleID() + " " + vehicle.getDistanceTravelled());
+		System.out.println("Crossed " + vehicle.getVehicleID() + " " + vehicle.getWaitingTime());
 		vehicle.setStatus("Crossed");
 		vehicle.setVehicleMoved(false);
 	}

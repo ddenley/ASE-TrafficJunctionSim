@@ -215,6 +215,16 @@ public class GUIMainController {
 	}
 	
 	private void exitFunction() {
+		String[] lines = new String[8];
+		String[][] segmentsStats = vehiclesModel.phaseStatistics();
+		for(String[] segmentStats : segmentsStats) {
+			
+		}
+		ProduceReport.createReport(lines);
+		System.exit(0);
+	}
+	
+	private void exitFunctionOLD() {
 		int[] vehiclesCrossedCounts = vehiclesModel.getVehiclesCrossedCounts();
 		float[] averageSegmentWaitTimes = phaseModel.getAverageSegmentWaitingTimes();
 		Object[][] vehicleStatistics = vehiclesModel.getSegmentStatistics();

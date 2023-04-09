@@ -274,10 +274,12 @@ public class Vehicles {
 		}
 	}
 	
-	public void phaseStatistics() {
+	//TODO: Emission sum should probably include waiting/crossing also?
+	public String[][] phaseStatistics() {
 		List<String> phases = Arrays.asList("P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8");
 		int[] crossedCounts = new int[] {0,0,0,0,0,0,0,0};
 		float[] emissionSum = new float[] {0,0,0,0,0,0,0,0};
+		float[] waitingSum = new float[] {0,0,0,0,0,0,0,0};
 		for (Vehicle vehicle : vehiclesHMap.values()) {
 			if(vehicle.getStatus().equals("Crossed")) {
 				int index = phases.indexOf(vehicle.getEightPhaseAllocation());
@@ -286,8 +288,17 @@ public class Vehicles {
 				//Increment emission count
 				emissionSum[index] += vehicle.getEmissionRate();
 				//Increment time waited
-				
+				waitingSum[index] += vehicle.getWaitingTime();
 			}
 		}
+		String[][] phaseStats = new String[phases.size()][3];
+		int i = 0;
+		while (i < phases.size()) {
+			phaseStats[i][1] = String.valueOf(crossedCounts[i]);
+			phaseStats[i][2] = String.valueOf(emissionSum[i]);
+			phaseStats[i][3] = String.valueOf(waitingSum[i]);
+			i++;
+		}
+		return phaseStats;
 	}
 }
