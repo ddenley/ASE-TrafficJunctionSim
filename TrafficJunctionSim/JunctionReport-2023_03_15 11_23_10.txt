@@ -1,5 +1,0 @@
-Traffic Junction Simulator Report || Dated: 2023/03/15 11:23:10
-Statistics Per Phase:
-2412
-nahs^7
-validsad
