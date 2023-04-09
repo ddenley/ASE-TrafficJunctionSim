@@ -91,7 +91,7 @@ public class Vehicles {
 	
 	//Method inserts vehicle key, vehicle pair into hashmap
 	//Throws duplicate vehicle ID exception
-	public void insertVehicleHashMap(Vehicle v) throws DuplicateVehicleIDException{
+	public synchronized void insertVehicleHashMap(Vehicle v) throws DuplicateVehicleIDException{
 		if(this.vehiclesHMap.containsKey(v.getVehicleID())) {
 			throw new DuplicateVehicleIDException(v.getVehicleID());
 		}

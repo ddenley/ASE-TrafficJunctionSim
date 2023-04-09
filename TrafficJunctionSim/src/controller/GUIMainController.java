@@ -68,7 +68,6 @@ public class GUIMainController {
 		String[] vehiclesHeader = vehiclesModel.getVehicleHeaders();
 		Object[][] vehiclesContents = vehiclesModel.getVehicles2DArray();
 		//Set in view
-		System.out.println("TEST");
 		view.setTableVehicles(vehiclesHeader, vehiclesContents);
 	}
 	private void updatePhasesTable() {
@@ -153,6 +152,10 @@ public class GUIMainController {
 					tControllerMade = true;
 					trafficControllerThread = new Thread(trafficController);
 					trafficControllerThread.start();
+					//Start arrival process
+					VehicleGenerator vehicleGen = new VehicleGenerator(vehiclesModel, phaseModel);
+					Thread vehicleGenThread = new Thread(vehicleGen);
+					vehicleGenThread.start();
 				}
 				else {
 					System.out.println("Already started");
@@ -199,7 +202,7 @@ public class GUIMainController {
 
 			@Override
 			public void run() {
-				System.out.println("Model changed");
+				//System.out.println("Model changed");
 				updateVehiclesTable();
 				updatePhasesTable();
 				updatePhasesAllocationTable();
@@ -227,7 +230,7 @@ public class GUIMainController {
 	
 	//Use controller to update GUI
 		public void trafficControllerUpdated() {
-			System.out.println("Update from traffic controller");
+			//System.out.println("Update from traffic controller");
 			updateActivePhasesTable();
 			//updateVehiclesTable();
 		}

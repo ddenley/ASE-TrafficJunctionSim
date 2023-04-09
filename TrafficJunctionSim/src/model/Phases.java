@@ -120,13 +120,12 @@ public class Phases {
 	
 	//Method takes a vehicle object and inserts into correct queue
 	//Called when adding vehicles from GUI
-	public void insertVehicleQueue(Vehicle v) {
+	public synchronized void insertVehicleQueue(Vehicle v) {
 		String phase_key = v.getEightPhaseAllocation();
 		String vehicle_key = v.getVehicleID();
 		Phase phase = this.phasesHMap.get(phase_key);
 		phase.addQueue(vehicle_key);
-		Object vehicleMonitor = v.getVehicleMonitor();
-		//phaseMonitorQueues.get(phase_key).add(vehicleMonitor);
+		v.providePhases(this);
 		
 		notifyObservers();
 	}

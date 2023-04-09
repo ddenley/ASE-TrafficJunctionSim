@@ -2,14 +2,17 @@ package controller;
 
 import java.util.Random;
 
+import exceptions.DuplicateVehicleIDException;
 import model.Phases;
+import model.Vehicle;
 import model.Vehicles;
 
 public class VehicleGenerator implements Runnable{
 
-	private final Vehicles vehicles;
-	private final Phases phases;
+	private Vehicles vehicles;
+	private Phases phases;
 	private Random random = new Random();
+	
 	
 	public VehicleGenerator(Vehicles vehicles, Phases phases) {
 		this.vehicles = vehicles;
@@ -25,6 +28,7 @@ public class VehicleGenerator implements Runnable{
 			//Produce random number between 0 and length of acceptable chars
 			int randIndex = random.nextInt(acceptableChars.length());
 			vehicleIDChars[i] = acceptableChars.charAt(randIndex);
+			i++;
 		}
 		return new String(vehicleIDChars);
 	}
@@ -69,12 +73,46 @@ public class VehicleGenerator implements Runnable{
 		return allowedSegments[randIndex];
 	}
 	
+	private Vehicle createVehicle() {
+		String[] params = new String[8];
+		params[0] = vehicleID();
+		params[1] = type();
+		params[2] = crossingTime();
+		params[3] = direction();
+		params[4] = length();
+		params[5] = emissionRate();
+		params[6] = status();
+		params[7] = segments();
+		return vehicles.buildVehicle(params);
+	}
+	
 	
 	
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		
+		try {
+			while(!Thread.currentThread().isInterrupted()) {
+				//issue
+				Vehicle vehicle = createVehicle();
+				try {
+					vehicles.insertVehicleHashMap(vehicle);
+					phases.insertVehicleQueue(vehicle);
+					Thread vehicle_thread = new Thread(vehicle);
+					System.out.println(vehicle.getVehicleID() + " arrived");
+					vehicle_thread.start();
+					long minSleepTime = 20 * 1000;
+					long randTime = (long)random.nextInt(10);
+					Thread.sleep(minSleepTime + randTime);
+				} catch (DuplicateVehicleIDException e) {
+					// TODO Auto-generated catch block
+					System.out.println("Vehicle ID DUP ATTEMPTED");
+				}
+			}
+		}
+		catch(InterruptedException e) {
+			System.out.println("*****Vehicle gen interrupt*****");
+		}
 	}
 	
 	
