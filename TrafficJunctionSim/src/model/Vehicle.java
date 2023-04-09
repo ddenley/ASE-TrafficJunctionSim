@@ -32,6 +32,10 @@ public class Vehicle implements Runnable{
 	
 	private final AtomicBoolean isActive = new AtomicBoolean(false);
 	
+	private AtomicBoolean vehicleMoved;
+	private Vehicle vehicleInfront;
+	private float distanceTravelled;
+	
 	//TODO: These variables are for implementation in STAGE 2 can ignore
 	//This variable will hold how many cycles occurred before this vehicle crossed
 	private int cyclesBeforeCross;
@@ -184,10 +188,32 @@ public class Vehicle implements Runnable{
 		this.vehicleMonitor = new Object();
 		this.intersection = intersection;
 		this.crossingTimeMilli = (long)(Float.parseFloat(crossingTime) * 1000);
+		this.distanceTravelled = 0;
+		this.vehicleMoved = new AtomicBoolean(false);
 	}
 	
 	public void providePhases(Phases phases) {
 		this.phases = phases;
+	}
+	
+	public boolean isVehicleMoved() {
+		return vehicleMoved.get();
+	}
+	
+	public synchronized void setVehicleMoved(boolean moved) {
+		this.vehicleMoved.set(moved);
+	}
+	
+	public void setVehicleInfront(Vehicle v) {
+		this.vehicleInfront = v;
+	}
+	
+	public Vehicle getVehicleInfront() {
+		return this.vehicleInfront;
+	}
+	
+	public float getDistanceTravelled() {
+		return this.distanceTravelled;
 	}
 	
 	//Method for determining allocation in an eight phase layout
@@ -282,7 +308,7 @@ public class Vehicle implements Runnable{
 	}
 	
 	//Also need a setter for status	
-	public void setStatus(String status) {
+	public synchronized void setStatus(String status) {
 		this.status = status;
 		
 	}
@@ -331,9 +357,22 @@ public class Vehicle implements Runnable{
                 		e.printStackTrace();
                 	}
                 }
-                if (Thread.interrupted()) {
-                	System.out.println("Thread Interuppted");
-                	return;
+                
+                synchronized (vehicleMonitor) {
+                	if(vehicleInfront != null && vehicleInfront.isVehicleMoved()) {
+                    	vehicleInfront.setVehicleMoved(false);
+                    	distanceTravelled += vehicleInfront.getLength();
+                    	setVehicleMoved(true);
+                    }
+                    
+                    if (phases.checkLastInQueue(this)) {
+                    	setVehicleMoved(false);
+                    }
+                    
+                    if (Thread.interrupted()) {
+                    	System.out.println("Thread Interuppted");
+                    	return;
+                    }
                 }
             }
         }

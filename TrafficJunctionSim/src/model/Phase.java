@@ -1,5 +1,6 @@
 package model;
 
+import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -12,7 +13,7 @@ public class Phase {
 	//Phase object composed of a vehicle key queue and phase duration
 	//Accessed via getters
 	private float phaseDuration;
-	private Queue<String> vehicleKeysQueue = new LinkedList<String>();
+	private Deque<String> vehicleKeysQueue = new LinkedList<String>();
 	
 	//Constructor handles bad paramater input from files
 	//Illegal arguments here are left to be handled by the JVM - we do not want to proceed
@@ -56,7 +57,7 @@ public class Phase {
 		return this.phaseDuration;
 	}
 	
-	public Queue<String> getVehicleKeysQueue(){
+	public Deque<String> getVehicleKeysQueue(){
 		return this.vehicleKeysQueue;
 	}
 }

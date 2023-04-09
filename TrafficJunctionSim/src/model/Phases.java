@@ -3,6 +3,7 @@ package model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -112,6 +113,9 @@ public class Phases {
             
             //Get correct phase object and place vehicle ID into queue
             Phase phase = this.phasesHMap.get(vehiclePhaseAllocation);
+            //Add reference to vehicle infront
+            String vehicleInfrontID = phase.getVehicleKeysQueue().peekLast();
+            vehicle.setVehicleInfront(vehicles.getVehiclesHashMap().get(vehicleInfrontID));
             phase.addQueue(key);
             Object vehicleMonitor = vehicle.getVehicleMonitor();
             //phaseMonitorQueues.get(vehiclePhaseAllocation).add(vehicleMonitor);
@@ -124,6 +128,12 @@ public class Phases {
 		String phase_key = v.getEightPhaseAllocation();
 		String vehicle_key = v.getVehicleID();
 		Phase phase = this.phasesHMap.get(phase_key);
+		
+		//Get the vehicle infront of this one to hold as reference
+		String vehicleInfrontID = phase.getVehicleKeysQueue().peekLast();
+		Vehicle vehicleInfront = vehicles.getVehiclesHashMap().get(vehicleInfrontID);
+		v.setVehicleInfront(vehicleInfront);
+		
 		phase.addQueue(vehicle_key);
 		v.providePhases(this);
 		
@@ -393,4 +403,13 @@ public class Phases {
             phase.popQueue();
         }
     }
+	
+	public boolean checkLastInQueue(Vehicle vehicle) {
+		String phaseName = vehicle.getEightPhaseAllocation();
+		Deque<String> vehicleQueue = phasesHMap.get(phaseName).getVehicleKeysQueue();
+		if(vehicleQueue.isEmpty()) {
+			return false;
+		}
+		return(vehicleQueue.getLast().equals(vehicle.getVehicleID()));
+	}
 }
