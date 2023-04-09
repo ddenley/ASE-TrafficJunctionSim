@@ -40,7 +40,7 @@ public class VehicleGenerator implements Runnable{
 	}
 	
 	private String crossingTime() {
-		float max = 30;
+		float max = 10;
 		float randFloat = random.nextFloat() * max;
 		return String.format("%.02f", randFloat);
 	}

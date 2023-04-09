@@ -95,7 +95,7 @@ public class GUIMainController {
 		view.setTableAddVehicleToEmpty();
 	}
 	private synchronized void updateActivePhasesTable() {
-		String[] activePhases = trafficController.getActivePhases();
+		String[] activePhases = trafficController.getPhaseNameWithLightStatus();
 		Object[][] activePhasesContent = new Object[2][1];
 		int i = 0;
 		for (String phaseName : activePhases) {
@@ -197,7 +197,7 @@ public class GUIMainController {
 		}
 	}
 	
-	public void updateGUI() {
+	public synchronized void updateGUI() {
 		SwingUtilities.invokeLater(new Runnable() {
 
 			@Override
@@ -216,27 +216,24 @@ public class GUIMainController {
 	
 	private void exitFunction() {
 		String[] lines = new String[8];
-		String[][] segmentsStats = vehiclesModel.phaseStatistics();
-		for(String[] segmentStats : segmentsStats) {
-			
+		String[][] phasesStats = vehiclesModel.phaseStatistics();
+		int i = 0;
+		for(String[] phaseStats : phasesStats) {
+			String crossedCounts = phaseStats[0];
+			String emissionSum = String.format("%.2f",Double.valueOf(phaseStats[1]));
+			String waitingTimeSum = phaseStats[2];
+			String averageWaitingTime = String.valueOf(Double.valueOf(waitingTimeSum) / Double.valueOf(crossedCounts));
+			if(averageWaitingTime.equals("NaN")) {
+				averageWaitingTime = "0";
+			}
+			averageWaitingTime = String.format("%.2f",Double.valueOf(averageWaitingTime));
+			lines[i] = String.format("Phase: %s	Vehicles crossed: %s	Emissions Produced: %s	Average Vehicle Wait Time: %s", i+1, crossedCounts, emissionSum, averageWaitingTime);
+			i++;
 		}
 		ProduceReport.createReport(lines);
 		System.exit(0);
 	}
 	
-	private void exitFunctionOLD() {
-		int[] vehiclesCrossedCounts = vehiclesModel.getVehiclesCrossedCounts();
-		float[] averageSegmentWaitTimes = phaseModel.getAverageSegmentWaitingTimes();
-		Object[][] vehicleStatistics = vehiclesModel.getSegmentStatistics();
-		String[] lines = new String[5];
-		lines[0] = "Segment 1:-	Vehicles Crossed:" + vehiclesCrossedCounts[0] + " average waiting time: " + averageSegmentWaitTimes[0];
-		lines[1] = "Segment 2:-	Vehicles Crossed:" + vehiclesCrossedCounts[1] + " average waiting time: " + averageSegmentWaitTimes[1];
-		lines[2] = "Segment 3:-	Vehicles Crossed:" + vehiclesCrossedCounts[2] + " average waiting time: " + averageSegmentWaitTimes[2];
-		lines[3] = "Segment 4:-	Vehicles Crossed:" + vehiclesCrossedCounts[3] + " average waiting time: " + averageSegmentWaitTimes[3];
-		lines[4] = "Total emissions: " + vehiclesModel.getTotalCO2PerMinute();
-		ProduceReport.createReport(lines);
-		System.exit(0);
-	}
 	
 	//Use controller to update GUI
 		public void trafficControllerUpdated() {

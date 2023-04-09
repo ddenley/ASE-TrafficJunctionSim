@@ -124,8 +124,8 @@ public class Vehicle implements Runnable{
 		catch(NumberFormatException e) {
 			throw new IllegalArgumentException("Invalid crossing time - must be numeric: " + crossingTime);
 		}
-		//Check that vehicle crossing time is valid (above 0 and smaller than 30)
-		if(Float.parseFloat(crossingTime) <= 0 || Float.parseFloat(crossingTime) >= 30) {
+		//Check that vehicle crossing time is valid (above 0 and smaller than 11)
+		if(Float.parseFloat(crossingTime) <= 0 || Float.parseFloat(crossingTime) >= 11) {
 			throw new IllegalArgumentException("Invalid crossing time: " + crossingTime);
 		}
 		this.crossingTime = Float.parseFloat(crossingTime);

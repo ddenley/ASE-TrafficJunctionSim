@@ -275,7 +275,7 @@ public class Vehicles {
 	}
 	
 	//TODO: Emission sum should probably include waiting/crossing also?
-	public String[][] phaseStatistics() {
+	public synchronized String[][] phaseStatistics() {
 		List<String> phases = Arrays.asList("P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8");
 		int[] crossedCounts = new int[] {0,0,0,0,0,0,0,0};
 		float[] emissionSum = new float[] {0,0,0,0,0,0,0,0};
@@ -294,9 +294,9 @@ public class Vehicles {
 		String[][] phaseStats = new String[phases.size()][3];
 		int i = 0;
 		while (i < phases.size()) {
-			phaseStats[i][1] = String.valueOf(crossedCounts[i]);
-			phaseStats[i][2] = String.valueOf(emissionSum[i]);
-			phaseStats[i][3] = String.valueOf(waitingSum[i]);
+			phaseStats[i][0] = String.valueOf(crossedCounts[i]);
+			phaseStats[i][1] = String.valueOf(emissionSum[i]);
+			phaseStats[i][2] = String.valueOf(waitingSum[i]);
 			i++;
 		}
 		return phaseStats;

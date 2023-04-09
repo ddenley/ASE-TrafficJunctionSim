@@ -23,8 +23,10 @@ public class TrafficController implements Runnable{
 		private LinkedList<Object[][]> segments;
 		//Active phases
 		private String activePhaseOne;
+		private String phaseOneName;
 		private float activePhaseOneDuration;
 		private String activePhaseTwo;
+		private String phaseTwoName;
 		private float activePhaseTwoDuration;
 		private Phases phases;
 		//Index of active segment
@@ -33,16 +35,35 @@ public class TrafficController implements Runnable{
 		private boolean trafficControllerActive;
 		
 		ScheduledExecutorService schedulerp1;
+		ScheduledExecutorService schedulerp1yellow;
+		ScheduledExecutorService schedulerp1red;
 		ScheduledExecutorService schedulerp2;
+		ScheduledExecutorService schedulerp2yellow;
+		ScheduledExecutorService schedulerp2red;
+		
+		private final long yellowLightsSeconds = 10;
+		private final long redLightsSeconds = 10;
+		private String lightsStatusP1;
+		private String lightsStatusP2;
 		
 		//Constructor
 		public TrafficController(Phases phases, GUIMainController controller) {
 			this.controller = controller;
 			this.phases = phases;
 			this.segments = createSegmentList(phases.getPhasesHmap());
-			segmentIndex = 0;
+			this.segmentIndex = 0;
+			this.lightsStatusP1 = "Green";
+			this.lightsStatusP2 = "Green";
 			updateActivePhaseInfo();
-			trafficControllerActive = true;
+			this.trafficControllerActive = true;
+		}
+		
+		public String getActiveSegment() {
+			return String.valueOf(segmentIndex + 1) + "S";
+		}
+		
+		public String[] getLightsStatus() {
+			return new String[] {this.lightsStatusP1, this.lightsStatusP2};
 		}
 		
 		//Method bundles phases into 2d array and creates a linked list
@@ -92,12 +113,16 @@ public class TrafficController implements Runnable{
 		private void updateActivePhaseInfo() {
 			Object[][] segment = segments.get(segmentIndex);
 			this.activePhaseOne = (String)segment[0][0];
+			this.phaseOneName = (String)segment[0][0];
 			this.activePhaseOneDuration = (float)segment[0][1];
 			this.activePhaseTwo = (String)segment[1][0];
+			this.phaseTwoName = (String)segment[1][0];
 			this.activePhaseTwoDuration = (float)segment[1][1];
 		}
 		
 		public void phaseLights() {
+			lightsStatusP1 = "Green";
+			lightsStatusP2 = "Green";
 			notifyController();
 			//Get phase durations
 			float p1Duration = this.activePhaseOneDuration;
@@ -109,34 +134,62 @@ public class TrafficController implements Runnable{
 			schedulerp1 = Executors.newScheduledThreadPool(1);
 			schedulerp1.schedule(() -> p1Active.set(false), p1DurationMilli, TimeUnit.MILLISECONDS);
 			
+			AtomicBoolean p1Yellow = new AtomicBoolean(true);
+			schedulerp1yellow = Executors.newScheduledThreadPool(1);
+			schedulerp1yellow.schedule(() -> p1Yellow.set(false), p1DurationMilli - (yellowLightsSeconds * 1000), TimeUnit.MILLISECONDS);
+			
+			AtomicBoolean p1Red = new AtomicBoolean(true);
+			schedulerp1red = Executors.newScheduledThreadPool(1);
+			schedulerp1red.schedule(() -> p1Red.set(false), p1DurationMilli, TimeUnit.MILLISECONDS);
+			
 			AtomicBoolean p2Active = new AtomicBoolean(true);
 			schedulerp2 = Executors.newScheduledThreadPool(1);
-			schedulerp1.schedule(() -> p2Active.set(false), p2DurationMilli, TimeUnit.MILLISECONDS);
+			schedulerp2.schedule(() -> p2Active.set(false), p2DurationMilli, TimeUnit.MILLISECONDS);
+			
+			AtomicBoolean p2Yellow = new AtomicBoolean(true);
+			schedulerp2yellow = Executors.newScheduledThreadPool(1);
+			schedulerp2yellow.schedule(() -> p2Yellow.set(false), p2DurationMilli - (yellowLightsSeconds * 1000), TimeUnit.MILLISECONDS);
+			
+			AtomicBoolean p2Red = new AtomicBoolean(true);
+			schedulerp2red = Executors.newScheduledThreadPool(1);
+			schedulerp2red.schedule(() -> p2Red.set(false), p2DurationMilli, TimeUnit.MILLISECONDS);
 			
 			boolean p1Notified = false;
 			boolean p2Notified = false;
-			while(true) {
-				if(!p1Active.get()) {
-					if (!p1Notified) {
-						p1Notified = true;
-						System.out.println("Deactivate " + activePhaseOne);
-						notifyVehicles(activePhaseOne);
-						this.activePhaseOne = null;
-						notifyController();
-					}
-				}
-				if(!p2Active.get()) {
-					if(!p2Notified) {
-						p2Notified = true;
-						System.out.println("Deactivate " + activePhaseTwo);
-						notifyVehicles(activePhaseTwo);
-						this.activePhaseTwo = null;
-						notifyController();
-					}
-				}
-				if(!p1Active.get() && !p2Active.get()) {
-					break;
-				}
+			while (true) {
+			    if (!p1Yellow.get() && lightsStatusP1.equals("Green")) {
+			        lightsStatusP1 = "Yellow";
+			        notifyController();
+			    }
+			    if (!p1Red.get() && lightsStatusP1.equals("Yellow")) {
+			        lightsStatusP1 = "Red";
+			        notifyController();
+			    }
+			    if (!p2Yellow.get() && lightsStatusP2.equals("Green")) {
+			        lightsStatusP2 = "Yellow";
+			        notifyController();
+			    }
+			    if (!p2Red.get() && lightsStatusP2.equals("Yellow")) {
+			        lightsStatusP2 = "Red";
+			        notifyController();
+			    }
+			    if (!p1Active.get() && !p1Notified) {
+			        p1Notified = true;
+			        System.out.println("Deactivate " + activePhaseOne);
+			        notifyVehicles(activePhaseOne);
+			        activePhaseOne = null;
+			        notifyController();
+			    }
+			    if (!p2Active.get() && !p2Notified) {
+			        p2Notified = true;
+			        System.out.println("Deactivate " + activePhaseTwo);
+			        notifyVehicles(activePhaseTwo);
+			        activePhaseTwo = null;
+			        notifyController();
+			    }
+			    if (!p1Active.get() && !p2Active.get()) {
+			        break;
+			    }
 				try {
 	                Thread.sleep(100);
 	            } catch (InterruptedException e) {
@@ -146,6 +199,10 @@ public class TrafficController implements Runnable{
 
 	        schedulerp1.shutdown();
 	        schedulerp2.shutdown();
+	        schedulerp1yellow.shutdown();
+	        schedulerp2yellow.shutdown();
+	        schedulerp1red.shutdown();
+	        schedulerp2red.shutdown();
 	        System.out.println("CHANGING SEGMENT");
 		}
 		
@@ -154,6 +211,11 @@ public class TrafficController implements Runnable{
 				notifyVehicles(activePhaseOne);
 				notifyVehicles(activePhaseTwo);
 				phaseLights();
+				try {
+		            Thread.sleep(redLightsSeconds * 1000);
+		        } catch (InterruptedException e) {
+		            e.printStackTrace();
+		        }
 				updateSegmentIndex();
 				updateActivePhaseInfo();
 			}
@@ -168,9 +230,17 @@ public class TrafficController implements Runnable{
 			return activePhases;
 		}
 		
+		public synchronized String[] getPhaseNameWithLightStatus() {
+			String phaseOne = this.phaseOneName + " - " + this.lightsStatusP1;
+			String phaseTwo = this.phaseTwoName + " - " + this.lightsStatusP2;
+			String[] activePhases = {phaseOne, phaseTwo};
+			return activePhases;
+		}
+		
 		private void notifyController() {
 			controller.trafficControllerUpdated();
 		}
+		
 		
 		public void endSimulation() {
 			trafficControllerActive = false;
