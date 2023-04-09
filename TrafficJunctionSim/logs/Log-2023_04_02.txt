@@ -1,0 +1,4 @@
+2023/04/02 17:58:46 - Test log message
+2023/04/02 18:01:52 - Test log message
+2023/04/02 18:02:32 - Application Started
+2023/04/02 19:35:54 - Application Started
