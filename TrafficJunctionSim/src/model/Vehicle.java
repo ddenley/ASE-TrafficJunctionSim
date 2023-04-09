@@ -36,6 +36,9 @@ public class Vehicle implements Runnable{
 	private Vehicle vehicleInfront;
 	private float distanceTravelled;
 	
+	private long timeCreated;
+	private long waitingTime;
+	
 	//TODO: These variables are for implementation in STAGE 2 can ignore
 	//This variable will hold how many cycles occurred before this vehicle crossed
 	private int cyclesBeforeCross;
@@ -190,6 +193,19 @@ public class Vehicle implements Runnable{
 		this.crossingTimeMilli = (long)(Float.parseFloat(crossingTime) * 1000);
 		this.distanceTravelled = 0;
 		this.vehicleMoved = new AtomicBoolean(false);
+		this.timeCreated = System.currentTimeMillis();
+		this.waitingTime = 0;
+	}
+	
+	//Waiting time is set once a vehicle has entered the intersection
+	//Going to be set as seconds
+	public void setWaitingTime() {
+		long waitingTimeMillis = System.currentTimeMillis() - timeCreated;
+		
+	}
+	
+	public long getWaitingTime() {
+		return this.waitingTime;
 	}
 	
 	public void providePhases(Phases phases) {

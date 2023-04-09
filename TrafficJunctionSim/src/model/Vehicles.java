@@ -9,6 +9,7 @@ import utility.ReadCSV;
 import view.GUIMain;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * @author Daniel Denley
@@ -130,7 +131,7 @@ public class Vehicles {
 	
 	//Returns the total CO2 of all vehicles in a waiting state as a string
 	//Get emission rate for all vehicles waiting and convert to kg per minute
-	public String getTotalCO2PerMinute() {
+	public synchronized String getTotalCO2PerMinute() {
 		float emissionRateSum = 0;
 		for(Vehicle vehicle : vehiclesHMap.values()) {
 			if(vehicle.getStatus().equals("Waiting")) {
@@ -145,7 +146,7 @@ public class Vehicles {
 	
 	//Method builds a 2D object array for the statistics JTable in the GUI
 	//Uses class methods to produce needed values
-	public Object[][] getSegmentStatistics() {
+	public synchronized Object[][] getSegmentStatistics() {
 		Object[][] segmentStatsArray = new Object[4][5];
 		//Set segment names for segmentStatsArray
 		segmentStatsArray[0][0] = "S1";
@@ -270,6 +271,23 @@ public class Vehicles {
 	private void notifyObservers() {
 		for(GUIMain observer : observers) {
 			observer.modelUpdated();
+		}
+	}
+	
+	public void phaseStatistics() {
+		List<String> phases = Arrays.asList("P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8");
+		int[] crossedCounts = new int[] {0,0,0,0,0,0,0,0};
+		float[] emissionSum = new float[] {0,0,0,0,0,0,0,0};
+		for (Vehicle vehicle : vehiclesHMap.values()) {
+			if(vehicle.getStatus().equals("Crossed")) {
+				int index = phases.indexOf(vehicle.getEightPhaseAllocation());
+				//Increment crossed count
+				crossedCounts[index] += 1; 
+				//Increment emission count
+				emissionSum[index] += vehicle.getEmissionRate();
+				//Increment time waited
+				
+			}
 		}
 	}
 }
