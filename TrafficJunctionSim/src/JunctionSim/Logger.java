@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter;
 
 public class Logger {
     // The instance variable holds the single instance of the Logger class
-    private static Logger instance = null;
+    private static Logger instance= null;
 
     // The writer variable is used to write log messages to a file
     private PrintWriter writer;
@@ -17,10 +17,7 @@ public class Logger {
     // The private constructor is called only once to create the single instance of the Logger class
     private Logger() {
         try {
-        	String fileName = "Log-" + getDateTime().substring(0,10) + ".txt";
-        	//changing "/" ":"character to be a valid file name
-        	fileName = fileName.replace("/", "_");
-    		fileName = fileName.replace(":", "_"); 
+        	String fileName = getFilename(); 
             // Create a FileWriter object that writes to a file named "log.txt"
             FileWriter fw = new FileWriter(fileName, true);
 
@@ -33,6 +30,17 @@ public class Logger {
             //Auto-generated catch block If an exception occurs while creating the file writer, print the stack trace
             e.printStackTrace();
         }
+    }
+    
+    // getting the log filename so this method can be used in tests
+    public String getFilename()
+    {
+    	String filename = "Log-" + getDateTime().substring(0, 10) + ".txt";
+    	//changing "/" ":" characters so that it is a valid filename
+    	filename = filename.replace("/", "_").replace(":", "_");
+    	// save in directory logs
+    	filename = "logs/" + filename;
+    	return filename;
     }
 
     // The static getInstance() method returns the single instance of the Logger class

@@ -51,6 +51,18 @@ public class GUIMain extends JFrame implements ActionListener{
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		
+		//get the single instance of the Logger class
+		Logger mylogger = Logger.getInstance();
+		
+		//write a log message
+		mylogger.log("Application Started");
+		
+		
+		//close the logger
+		mylogger.close();
+		
+	
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
