@@ -1,6 +1,6 @@
 package Test;
 
-import JunctionSim.Logger;
+import utility.Logger;
 
 import org.junit.After;
 import org.junit.Assert;
