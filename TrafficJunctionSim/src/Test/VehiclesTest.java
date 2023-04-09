@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import JunctionSim.DuplicateVehicleIDException;
-import JunctionSim.Vehicle;
-import JunctionSim.Vehicles;
+import exceptions.DuplicateVehicleIDException;
+import model.Vehicle;
+import model.Vehicles;
 
 /**
  * @author Daniel Denley and Ahmad

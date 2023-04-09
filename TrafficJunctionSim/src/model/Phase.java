@@ -1,4 +1,4 @@
-package JunctionSim;
+package model;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -41,6 +41,14 @@ public class Phase {
 	public String popQueue() {
 		//TODO: When popping ensure that the vehicle object is updated both with the vehiclesPopped and cycle variable
 		return vehicleKeysQueue.poll();
+	}
+	
+	public String peekQueue() {
+		return vehicleKeysQueue.peek();
+	}
+	
+	public boolean isEmpty() {
+		return vehicleKeysQueue.isEmpty();
 	}
 	
 	//Getters

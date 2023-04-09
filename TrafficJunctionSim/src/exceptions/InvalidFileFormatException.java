@@ -1,4 +1,4 @@
-package JunctionSim;
+package exceptions;
 
 /**
  * @author Daniel Denley

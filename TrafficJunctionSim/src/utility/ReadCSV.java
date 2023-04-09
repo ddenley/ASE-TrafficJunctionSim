@@ -1,10 +1,13 @@
-package JunctionSim;
+package utility;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+
+import exceptions.InvalidFileFormatException;
+import JunctionSim.JunctionSim;
 
 /**
  * @author Daniel Denley
@@ -34,12 +37,12 @@ public class ReadCSV {
 					continue;
 				}
 				//Check if file line has appropriate number of columns if not skip
-				if (fileLine.split(",").length != 8 && filePath.equals(GUIMain.vehiclesCSVFile)) {
+				if (fileLine.split(",").length != 8 && filePath.equals(JunctionSim.vehiclesCSVFile)) {
 					System.out.println("Invalid file line in: " + filePath);
 					System.out.println("Skipping line");
 					continue;
 				}
-				if (fileLine.split(",").length != 2 && filePath.equals(GUIMain.intersectionCSVFile)) {
+				if (fileLine.split(",").length != 2 && filePath.equals(JunctionSim.intersectionCSVFile)) {
 					System.out.println("Invalid file line in: " + filePath);
 					System.out.println("Skipping line");
 					continue;
@@ -53,12 +56,12 @@ public class ReadCSV {
 				values.add(lineValues);
 			}
 			//Throw an exception if there isnt at least two lines - a header and one vehicle
-			if(lineCount < 2 && filePath.equals(GUIMain.vehiclesCSVFile)) {
+			if(lineCount < 2 && filePath.equals(JunctionSim.vehiclesCSVFile)) {
 				System.out.println(lineCount);
 				throw new InvalidFileFormatException(filePath);
 			}
 			//Throw an exception if there isnt at least eight phases in the intersection file
-			if(lineCount < 9 && filePath.equals(GUIMain.intersectionCSVFile)) {
+			if(lineCount < 9 && filePath.equals(JunctionSim.intersectionCSVFile)) {
 				throw new InvalidFileFormatException(filePath);
 			}
 		}

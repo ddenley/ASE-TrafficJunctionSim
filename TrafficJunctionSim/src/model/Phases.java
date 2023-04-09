@@ -1,4 +1,4 @@
-package JunctionSim;
+package model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,14 +11,24 @@ import java.util.Queue;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import exceptions.InvalidFileFormatException;
+import utility.ReadCSV;
+//Imported so I can add it as an observer
+import view.GUIMain;
+
 /**
  * @author Daniel Denley
  *
  */
 public class Phases {
+	//List of observers for this model
+	private List <GUIMain> observers;
+	
 	
 	// Hash map will have phase string as ID and a phase object which holds a queue of vehicles
 	private HashMap<String, Phase> phasesHMap = new HashMap<String, Phase>();
+	//Collection of vehicle monitor objects for each vehicle
+	//private HashMap<String, Queue<Object>> phaseMonitorQueues = new HashMap<String, Queue<Object>>();
 	private String[] phaseHeaders;
 	
 	//Holds a reference to the vehicles object for population of its queues
@@ -32,6 +42,7 @@ public class Phases {
 	//Phases constructor takes reference to vehicles for queue population
 	//Reference to init csv file for phase durations and names
 	public Phases(Vehicles vehicles, String intersectionCSVFile) {
+		observers = new ArrayList<>();
 		this.vehicles = vehicles;
 		// First read intersection.csv to create phasesHMap and set phaseHeaders
 		Object[] header_values = ReadCSV.getHeaderValues(intersectionCSVFile);
@@ -42,6 +53,14 @@ public class Phases {
 		//Now populate each phase queue from the vehicles hash map for initial init
 		populatePhaseQueuesFromHashTable();
 	}
+	
+	public HashMap<String, Phase> getPhasesHmap() {
+		return this.phasesHMap;
+	}
+	
+//	public HashMap<String, Queue<Object>> getVehicleMonitorsQueue(){
+//		return this.phaseMonitorQueues;
+//	}
 	
 	//Method can throw an unhandled InvalidFileFormatException to ensure we do not enter a weird state
 	//Invalid files include if phase number is invalid
@@ -58,6 +77,8 @@ public class Phases {
 					Phase phase = new Phase(phase_duration);
 					//Add phase to hash map
 					this.phasesHMap.putIfAbsent(phase_name, phase);
+					//Add monitors
+					//phaseMonitorQueues.put(phase_name, new LinkedList<>());
 				}
 				catch (IllegalArgumentException ae) {
 					System.out.println(ae.getMessage());
@@ -80,24 +101,33 @@ public class Phases {
 	private void populatePhaseQueuesFromHashTable() {
 		for (Map.Entry<String, Vehicle> entry : this.vehicles.getVehiclesHashMap().entrySet())
         {
+			
+			//Populates each queue accordingly
             String key = entry.getKey();
             Vehicle vehicle = entry.getValue();
+            
+            vehicle.providePhases(this);
             
             String vehiclePhaseAllocation = vehicle.getEightPhaseAllocation();
             
             //Get correct phase object and place vehicle ID into queue
             Phase phase = this.phasesHMap.get(vehiclePhaseAllocation);
             phase.addQueue(key);
+            Object vehicleMonitor = vehicle.getVehicleMonitor();
+            //phaseMonitorQueues.get(vehiclePhaseAllocation).add(vehicleMonitor);
         }
 	}
 	
 	//Method takes a vehicle object and inserts into correct queue
 	//Called when adding vehicles from GUI
-	public void insertVehicleQueue(Vehicle v) {
+	public synchronized void insertVehicleQueue(Vehicle v) {
 		String phase_key = v.getEightPhaseAllocation();
 		String vehicle_key = v.getVehicleID();
 		Phase phase = this.phasesHMap.get(phase_key);
 		phase.addQueue(vehicle_key);
+		v.providePhases(this);
+		
+		notifyObservers();
 	}
 	
 	public String[] getPhaseHeaders() {
@@ -315,4 +345,52 @@ public class Phases {
 		//System.out.println(CO2Estimate);
 		return CO2Estimate;
 	}
+	
+	//Methods for subject/observer pattern
+	public void addObserver(GUIMain observer) {
+		observers.add(observer);
+	}
+	public void removerObserver(GUIMain observer) {
+		observers.remove(observer);
+	}
+	public void notifyObservers() {
+		for(GUIMain observer : observers) {
+			observer.modelUpdated();
+		}
+	}
+	
+	//Notify all vehicles in the phase they are active
+	public void notifyVehicles(String phaseID) {
+		//Get vehicle ID queue associated with phaseID
+		Queue<String> phaseQueue = phasesHMap.get(phaseID).getVehicleKeysQueue();
+		//Get the vehicles hash map
+		HashMap<String, Vehicle> vehiclesHashMap = vehicles.getVehiclesHashMap();
+		//Notify each vehicle
+		for(String vID : phaseQueue) {
+			//Get vehicle object
+			Vehicle vehicle = vehiclesHashMap.get(vID);
+			//Notify vehicle
+			synchronized (vehicle.getVehicleMonitor()) {
+		        vehicle.toggleActive();
+		    }
+		}
+	}
+	
+	public synchronized boolean isVehicleNext(Vehicle vehicle) {
+		String phaseName = vehicle.getEightPhaseAllocation();
+		Phase phase = phasesHMap.get(phaseName);
+		if (phase.isEmpty()) {
+			return false;
+		}
+		return phase.peekQueue().equals(vehicle.getVehicleID());
+	}
+	
+	public synchronized void removeVehicle(Vehicle vehicle) {
+        String phaseName = vehicle.getEightPhaseAllocation();
+        Phase phase = phasesHMap.get(phaseName);
+        
+        if (phase.peekQueue().equals(vehicle.getVehicleID())) {
+            phase.popQueue();
+        }
+    }
 }

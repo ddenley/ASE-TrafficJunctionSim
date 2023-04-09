@@ -4,10 +4,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-import JunctionSim.InvalidFileFormatException;
-import JunctionSim.Phases;
-import JunctionSim.Vehicle;
-import JunctionSim.Vehicles;
+import exceptions.InvalidFileFormatException;
+import model.Phases;
+import model.Vehicle;
+import model.Vehicles;
 /**
  * @author Daniel Denley
  *

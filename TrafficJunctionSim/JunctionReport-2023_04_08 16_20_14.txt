@@ -1,0 +1,7 @@
+Traffic Junction Simulator Report || Dated: 2023/04/08 16:20:14
+Statistics Per Phase:
+Segment 1:-	Vehicles Crossed:0 average waiting time: NaN
+Segment 2:-	Vehicles Crossed:0 average waiting time: NaN
+Segment 3:-	Vehicles Crossed:0 average waiting time: NaN
+Segment 4:-	Vehicles Crossed:0 average waiting time: NaN
+Total emissions: 0.24 KG per minute

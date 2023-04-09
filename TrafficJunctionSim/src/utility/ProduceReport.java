@@ -1,4 +1,4 @@
-package JunctionSim;
+package utility;
 import java.time.format.DateTimeFormatter;
 import java.io.FileWriter;
 import java.io.IOException;
