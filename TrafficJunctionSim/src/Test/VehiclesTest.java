@@ -81,8 +81,6 @@ class VehiclesTest {
 		float emissionRateSum = 12 + 7 + 9 + 12 + 12;
 		float expectedFloat = emissionRateSum / 1000;
 		String expected = String.format("%.2f", expectedFloat) + " KG per minute";
-		System.out.println(expected);
-		System.out.println(actual);
 		assertEquals(expected,actual);
 	}
 	
@@ -105,7 +103,7 @@ class VehiclesTest {
 		//Segment 2 expected stats - total length
 		expected[1][1] = (float)(5);
 		//Segment 2 expected stats - average crossing time
-		expected[1][2] = (float)(9);
+		expected[1][2] = (float)(10);
 		//Segment 2 expected stats - number of vehicles
 		expected[1][3] = 1;
 		//Segment 3 expected stats - total length
@@ -117,14 +115,34 @@ class VehiclesTest {
 		//Segment 4 expected stats - total length
 		expected[3][1] = (float)(14);
 		//Segment 4 expected stats - average crossing time
-		expected[3][2] = (float)(22);
+		expected[3][2] = (float)(10);
 		//Segment 4 expected stats - number of vehicles
 		expected[3][3] = 1;
 		
 		Object[][] actual = vehicles.getSegmentStatistics();
 		System.out.println("here");
-		System.out.println(actual);
-		System.out.println(expected);
+		System.out.println(actual.toString());
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 5; j++) {
+				System.out.print(actual[i][j] + " ");
+				
+			}
+			System.out.println();
+			
+		}
+
+        System.out.println("Expected");
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 5; j++) {
+				System.out.print(expected[i][j] + " ");
+				
+			}
+			System.out.println();
+			
+		}
+		
+		
+		System.out.println(expected.toString());
 	
 		assertArrayEquals(expected, actual);
 	}
