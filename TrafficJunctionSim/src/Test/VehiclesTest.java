@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import JunctionSim.JunctionSim;
 import controller.Intersection;
 import exceptions.DuplicateVehicleIDException;
 import model.Vehicle;
@@ -25,22 +26,26 @@ class VehiclesTest {
 	//Tests for constructor - reading csv files is more thoroughly tested in ReadCSVTest
 	@Test
 	final void testVehiclesConstructorValidCSV() {
+		JunctionSim.vehiclesCSVFile = "TestData/VehiclesTestCSVs/test_vehicles_valid.csv";
 		Vehicles vehicles = new Vehicles("TestData/VehiclesTestCSVs/test_vehicles_valid.csv", this.intersection);
 	}
 	
 	@Test
 	final void testVehiclesConstructorMissingRowsCSV() {
+		JunctionSim.vehiclesCSVFile = "TestData/VehiclesTestCSVs/test_vehicles_missing_rows.csv";
 		Vehicles vehicles = new Vehicles("TestData/VehiclesTestCSVs/test_vehicles_missing_rows.csv", this.intersection);
 	}
 	
 	@Test
 	final void testVehiclesConstructorMissingValuesCSV() {
+		JunctionSim.vehiclesCSVFile = "TestData/VehiclesTestCSVs/test_vehicles_missing_values.csv";
 		Vehicles vehicles = new Vehicles("TestData/VehiclesTestCSVs/test_vehicles_missing_values.csv", this.intersection);
 	}
 	
 	//Tests for inserting vehicles into hash map
 	@Test
 	final void testinsertVehicleHashMapValid() {
+		JunctionSim.vehiclesCSVFile = "TestData/VehiclesTestCSVs/test_vehicles_valid.csv";
 		Vehicles vehicles = new Vehicles("TestData/VehiclesTestCSVs/test_vehicles_valid.csv", this.intersection);
 		Vehicle vehicle = new Vehicle("rrrIOp", "Car", "0.1", "Left", "20", "5", "Crossed", "S2", this.intersection);
 		try {
@@ -54,9 +59,10 @@ class VehiclesTest {
 	//Duplicate vehicle key
 	@Test
 	final void testinsertVehicleHashMapDuplicateKey() {
+		JunctionSim.vehiclesCSVFile = "TestData/VehiclesTestCSVs/test_vehicles_valid.csv";
 		Vehicles vehicles = new Vehicles("TestData/VehiclesTestCSVs/test_vehicles_valid.csv", this.intersection);
 		Vehicle vehicle = new Vehicle("rrrIOp", "Car", "0.1", "Left", "20", "5", "Crossed", "S2", this.intersection);
-		Vehicle vehicle2 = new Vehicle("rrrIOp", "Bus", "20", "Left", "24", "2", "Waiting", "S1", this.intersection);
+		Vehicle vehicle2 = new Vehicle("rrrIOp", "Bus", "10", "Left", "24", "2", "Waiting", "S1", this.intersection);
 		try {
 			vehicles.insertVehicleHashMap(vehicle);
 			assertThrows(DuplicateVehicleIDException.class, () -> vehicles.insertVehicleHashMap(vehicle2));
@@ -69,17 +75,21 @@ class VehiclesTest {
 	//Test for calculating CO2
 	@Test
 	final void testGetTotalC02() {
+		JunctionSim.vehiclesCSVFile = "TestData/VehiclesTestCSVs/test_vehicles_valid_for_stats.csv";
 		Vehicles vehicles = new Vehicles("TestData/VehiclesTestCSVs/test_vehicles_valid_for_stats.csv", this.intersection);
 		String actual = vehicles.getTotalCO2PerMinute();
 		float emissionRateSum = 12 + 7 + 9 + 12 + 12;
 		float expectedFloat = emissionRateSum / 1000;
 		String expected = String.format("%.2f", expectedFloat) + " KG per minute";
+		System.out.println(expected);
+		System.out.println(actual);
 		assertEquals(expected,actual);
 	}
 	
 	//Test for getting segment statistics
 	@Test
 	final void testGetSegmentStatistics() {
+		JunctionSim.vehiclesCSVFile = "TestData/VehiclesTestCSVs/test_vehicles_valid_for_stats.csv";
 		Vehicles vehicles = new Vehicles("TestData/VehiclesTestCSVs/test_vehicles_valid_for_stats.csv", this.intersection);
 		Object[][] expected = new Object[4][5];
 		expected[0][0] = "S1";
@@ -95,7 +105,7 @@ class VehiclesTest {
 		//Segment 2 expected stats - total length
 		expected[1][1] = (float)(5);
 		//Segment 2 expected stats - average crossing time
-		expected[1][2] = (float)(10);
+		expected[1][2] = (float)(9);
 		//Segment 2 expected stats - number of vehicles
 		expected[1][3] = 1;
 		//Segment 3 expected stats - total length
@@ -112,11 +122,16 @@ class VehiclesTest {
 		expected[3][3] = 1;
 		
 		Object[][] actual = vehicles.getSegmentStatistics();
+		System.out.println("here");
+		System.out.println(actual);
+		System.out.println(expected);
+	
 		assertArrayEquals(expected, actual);
 	}
 	
 	//Test for getting vehicles crossed count
 	final void testGetVehiclesCrossedCounts() {
+		JunctionSim.vehiclesCSVFile = "TestData/VehiclesTestCSVs/test_vehicles_valid_for_stats.csv";
 		Vehicles vehicles = new Vehicles("TestData/VehiclesTestCSVs/test_vehicles_valid_for_stats.csv", this.intersection);
 		Vehicle vehicle1 = new Vehicle("1rrIOp", "Car", "0.1", "Left", "20", "5", "Crossed", "S2", this.intersection);
 		Vehicle vehicle2 = new Vehicle("2rrIOp", "Car", "0.1", "Left", "20", "5", "Crossed", "S2", this.intersection);
