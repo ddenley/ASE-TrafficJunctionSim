@@ -9,6 +9,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.Queue;
 
+//Logger implements singleton pattern and runs in its own thread
+//Logger saves log file on exit of program
 public class Logger implements Runnable{
     // The instance variable holds the single instance of the Logger class
     private static Logger instance= null;
@@ -70,6 +72,8 @@ public class Logger implements Runnable{
     }
 
     // The log() method adds message to queue
+    //queue adding here uses a locked pattern to ensure only one thread accesses
+    //the queue at any one time - thread safe
     public void log(String message) {
         synchronized (lock) {
         	logMessages.add(message);
@@ -84,7 +88,7 @@ public class Logger implements Runnable{
 	}
 	
 
-    // The close() method closes the PrintWriter object and the log file
+    // Updates runnng thus exiting loop within run and saving the log file
     public void close() {
         running = false;
         synchronized (lock){
@@ -96,6 +100,7 @@ public class Logger implements Runnable{
     public void run() {
     	while(running) {
     		String message = null;
+    		//Only attempt to log from queue in a thread safe manner using lock
     		synchronized (lock) {
     			if (!logMessages.isEmpty()) {
     				message = logMessages.poll();

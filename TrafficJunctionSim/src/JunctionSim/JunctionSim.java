@@ -10,6 +10,9 @@ import model.Vehicles;
 import utility.Logger;
 import view.GUIMain;
 
+
+//Contains the main method
+//Models, views and main controller instance all created here
 public class JunctionSim {
 	
 	//Must be public and accessible for some testing functions

@@ -219,8 +219,8 @@ public class Vehicles {
 		return segmentCrossedCounts;
 	}
 	
-	//TODO: THIS METHOD IS FOR STAGE 2 FURTHER IMPLEMENTATION PLEASE IGNORE
-	//Require knowledge of phases for phase durations
+
+	//Ths only approximates vehicle wait time - used in stage 1
 	public float waitingTimeOfVehicle(Vehicle vehicle, Phases phases) {
 		//Get number of cycles that passed before this vehicle crossed
 		int cyclesBeforeCross = vehicle.getCyclesBeforeCross();

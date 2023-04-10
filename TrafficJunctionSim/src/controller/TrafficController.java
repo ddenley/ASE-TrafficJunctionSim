@@ -129,7 +129,9 @@ public class TrafficController implements Runnable{
 			this.activePhaseTwoDuration = (float)segment[1][1];
 		}
 		
+		//This method uses schedulers to determine how long a phase is active and update their lights based on traffic light durations
 		public void phaseLights() {
+			//Resets light status to green indicating phase is active on GUI
 			lightsStatusP1 = "Green";
 			Logger.getInstance().log(phaseOneName + " changed lights to " + lightsStatusP1);
 			lightsStatusP2 = "Green";
@@ -141,6 +143,7 @@ public class TrafficController implements Runnable{
 			float p2Duration = this.activePhaseTwoDuration;
 			long p2DurationMilli = (long)(p2Duration * 1000);
 
+			//Creation of schedulers which will update the boolean variables after set amount of time passes
 			AtomicBoolean p1Active = new AtomicBoolean(true);
 			schedulerp1 = Executors.newScheduledThreadPool(1);
 			schedulerp1.schedule(() -> p1Active.set(false), p1DurationMilli, TimeUnit.MILLISECONDS);
@@ -165,6 +168,9 @@ public class TrafficController implements Runnable{
 			schedulerp2red = Executors.newScheduledThreadPool(1);
 			schedulerp2red.schedule(() -> p2Red.set(false), p2DurationMilli, TimeUnit.MILLISECONDS);
 			
+			//Code here is looped until both phases are set to inactive by scheduler
+			//Notify controller method used here to update GUI of phase status
+			//Notify vehicles used here which toggles vehicles from running to wait state
 			boolean p1Notified = false;
 			boolean p2Notified = false;
 			while (true) {
@@ -218,6 +224,9 @@ public class TrafficController implements Runnable{
 	        schedulerp2red.shutdown();
 		}
 		
+		//Code looped from run method
+		//Notifies vehicles in active phase to go from wait to running state
+		//Thread sleep here used to implement red light stage between segments
 		public void iterateSegments() {
 			while (trafficControllerActive) {
 				notifyVehicles(activePhaseOne);
@@ -234,6 +243,8 @@ public class TrafficController implements Runnable{
 			}
 		}
 		
+		//Notifies vehicles within a phase queue
+		//The notify toggles vehicles from wait to running and vice-versa
 		private void notifyVehicles(String phase) {
 			phases.notifyVehicles(phase);
 		}
@@ -243,6 +254,8 @@ public class TrafficController implements Runnable{
 			return activePhases;
 		}
 		
+		//This get method is used to update the GUI
+		//Returns the active phase and its light status
 		public synchronized String[] getPhaseNameWithLightStatus() {
 			String phaseOne = this.phaseOneName + " - " + this.lightsStatusP1;
 			String phaseTwo = this.phaseTwoName + " - " + this.lightsStatusP2;
@@ -250,6 +263,7 @@ public class TrafficController implements Runnable{
 			return activePhases;
 		}
 		
+		//When main controller is notified here the phase lights status table is updated
 		private void notifyController() {
 			controller.trafficControllerUpdated();
 		}
