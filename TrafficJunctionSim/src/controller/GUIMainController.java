@@ -14,9 +14,14 @@ import exceptions.DuplicateVehicleIDException;
 import model.Phases;
 import model.Vehicle;
 import model.Vehicles;
+import utility.Logger;
 import utility.ProduceReport;
 import view.GUIMain;
 
+
+//Main controller thread of application
+//Updates GUI
+//Recieves calls from  TrafficController
 public class GUIMainController {
 	private Phases phaseModel;
 	private Vehicles vehiclesModel;
@@ -24,43 +29,48 @@ public class GUIMainController {
 	private TrafficController trafficController;
 	private boolean tControllerMade;
 	private Thread trafficControllerThread;
-	private List<Thread> vehicleThreads;
 	
 	
 	public GUIMainController(Phases phaseModel, Vehicles vehiclesModel, GUIMain view) {
 		this.phaseModel = phaseModel;
 		this.vehiclesModel = vehiclesModel;
 		this.view = view;
+		
 		//Register observers to view
 		phaseModel.addObserver(view);
 		vehiclesModel.addObserver(view);
+		
 		//Attach listeners
 		ActionListener actionHandler = new ActionHandler();
 		view.addBtnExitListener(actionHandler);
 		view.addBtnAddVehicleListener(actionHandler);
 		view.addBtnClearVehicleInputListener(actionHandler);
 		view.addBtnStartListener(actionHandler);
-		view.addBtnStopListener(actionHandler);
+		
 		//Init the view gui
 		updateGUI();
 		view.setVisible(true);
+		
 		//Provide view with controller so it can call GUI update methods
 		view.controller = this;
+		
 		//New traffic controller
 		this.trafficController = new TrafficController(phaseModel, this);
 		this.tControllerMade = false;
-		//Create vehicle threads and store them here
-		this.vehicleThreads = new ArrayList();
+		
+		//Start vehicle threads
 		initVehiclesThreads();
 	}
 	
+	
+	//Starts all vehicle threads - will be in wait state by default
 	private void initVehiclesThreads() {
 		for(Vehicle vehicle : vehiclesModel.getVehiclesHashMap().values()) {
 			Thread vehicle_thread = new Thread(vehicle);
-			vehicleThreads.add(vehicle_thread);
 			vehicle_thread.start();
 		}
 	}
+	
 	
 	//Update methods for tables
 	private void updateVehiclesTable() {
@@ -104,14 +114,12 @@ public class GUIMainController {
 		}
 		view.setTableActivePhases(activePhasesContent);
 	}
+	
+	
 	//Update methods for labels
 	private void updateCO2PerMinuteLabel() {
 		String text = "C02: " + vehiclesModel.getTotalCO2PerMinute();
 		view.setLblCO2PerMinute(text);
-	}
-	private void updateCO2EstimateLabel() {
-		String text = "Estimated Total C02 During Simulation: " + phaseModel.getTotalCO2Estimate() + " KG";
-		view.setLblCO2Estimate(text);
 	}
 	
 	
@@ -119,10 +127,12 @@ public class GUIMainController {
 	private class ActionHandler implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			String action = e.getActionCommand();
+			//Exit button
 			if ("btnExit".equals(action)) {
 				System.out.println("Exit action");
 				exitFunction();
 			}
+			//Add vehicle button
 			else if ("btnAddVehicle".equals(action)) {
 				System.out.println("Add Vehicle");
 				try {
@@ -141,12 +151,13 @@ public class GUIMainController {
 				               "Could Not Add Vehicle", JOptionPane.ERROR_MESSAGE);
 				}
 			}
+			//Clear input button
 			else if ("btnClearVehicleInput".equals(action)) {
 				System.out.println("Clear input");
 				updateAddVehicleTableToEmpty();
 			}
+			//Start button
 			else if ("btnStart".equals(action)) {
-				System.out.println("Start");
 				//Start traffic controller thread
 				if (!tControllerMade) {
 					tControllerMade = true;
@@ -161,25 +172,18 @@ public class GUIMainController {
 					System.out.println("Already started");
 				}
 			}
-			//TODO: FIX IF TIME ALLOWS
-			else if ("btnStop".equals(action)) {
-				System.out.println("Start");
-				trafficController.endSimulation();
-				trafficControllerThread.interrupt();
-			}
 		}
 	}
 	
-	//Method to add vehicle to model
+	
+	//Method to add vehicle to model - called on click of add vehicle button
 	private void addVehicle() throws DuplicateVehicleIDException {
 		//Get user input from view
 		String[] vehicleParams = view.getVehicleInput();
-		//Change model
 		//Build vehicle from input params and insert to hash map and queue
 		try {
 			//Build vehicle
 			Vehicle vehicle = vehiclesModel.buildVehicle(vehicleParams);
-			
 			try {
 				//Add vehicle to hash map
 				vehiclesModel.insertVehicleHashMap(vehicle);				
@@ -187,6 +191,7 @@ public class GUIMainController {
 				if(vehicle.getStatus().equals("Waiting")) {
 					phaseModel.insertVehicleQueue(vehicle);
 				}
+				Logger.getInstance().log(vehicle.getVehicleID() + " added via GUI");
 			}
 			catch(DuplicateVehicleIDException dke) {
 				throw dke;
@@ -197,24 +202,26 @@ public class GUIMainController {
 		}
 	}
 	
+	
+	//Called on change from a model class - i.e. vehicle added, status changed
 	public synchronized void updateGUI() {
+		//Ensures the code is ran by the main GUI thread - prevents threading errors of concurrent access
 		SwingUtilities.invokeLater(new Runnable() {
-
 			@Override
 			public void run() {
-				//System.out.println("Model changed");
 				updateVehiclesTable();
 				updatePhasesTable();
 				updatePhasesAllocationTable();
 				updateStatisticsTable();
 				updateCO2PerMinuteLabel();
-				updateCO2EstimateLabel();
-			}
-			
+			}	
 		});
 	}
 	
+	
+	//Called on click of exit button on GUI
 	private void exitFunction() {
+		//Section of code below builds the array to be passed to ProduceReport to write 
 		String[] lines = new String[8];
 		String[][] phasesStats = vehiclesModel.phaseStatistics();
 		int i = 0;
@@ -235,11 +242,9 @@ public class GUIMainController {
 	}
 	
 	
-	//Use controller to update GUI
+		//Called from traffic controller to update lights and active phases table
 		public void trafficControllerUpdated() {
-			//System.out.println("Update from traffic controller");
 			updateActivePhasesTable();
-			//updateVehiclesTable();
 		}
 	
 }

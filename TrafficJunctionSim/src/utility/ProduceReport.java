@@ -25,6 +25,7 @@ public class ProduceReport {
 		String fileName = "JunctionReport-" + getDateTime() + ".txt";
 		fileName = fileName.replace("/", "_");
 		fileName = fileName.replace(":", "_");
+		fileName = "reports/" + fileName;
 		FileWriter fw = new FileWriter(fileName);
 	 
 		for (int i = 0; i < reportLines.length; i++) {

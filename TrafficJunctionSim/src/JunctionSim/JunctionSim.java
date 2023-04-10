@@ -7,6 +7,7 @@ import controller.Intersection;
 import controller.TrafficController;
 import model.Phases;
 import model.Vehicles;
+import utility.Logger;
 import view.GUIMain;
 
 public class JunctionSim {
@@ -19,6 +20,7 @@ public class JunctionSim {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		Logger.getInstance().log("Application started");
 		//Create instance of intersection
 		Intersection intersection = new Intersection();
 		Vehicles vehiclesModel = new Vehicles(vehiclesCSVFile, intersection);

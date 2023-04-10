@@ -48,7 +48,7 @@ public class Logger implements Runnable{
     // getting the log filename so this method can be used in tests
     public String getFilename()
     {
-    	String filename = "Log-" + getDateTime().substring(0, 10) + ".txt";
+    	String filename = "Log-" + getDateTime() + ".txt";
     	//changing "/" ":" characters so that it is a valid filename
     	filename = filename.replace("/", "_").replace(":", "_");
     	// save in directory logs

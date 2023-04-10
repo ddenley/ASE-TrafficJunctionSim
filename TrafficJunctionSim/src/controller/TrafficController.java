@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import model.Phase;
 import model.Phases;
+import utility.Logger;
 import view.GUIMain;
 
 //Notifies main controller of changes
@@ -122,7 +123,9 @@ public class TrafficController implements Runnable{
 		
 		public void phaseLights() {
 			lightsStatusP1 = "Green";
+			Logger.getInstance().log(phaseOneName + " changed lights to " + lightsStatusP1);
 			lightsStatusP2 = "Green";
+			Logger.getInstance().log(phaseTwoName + " changed lights to " + lightsStatusP2);
 			notifyController();
 			//Get phase durations
 			float p1Duration = this.activePhaseOneDuration;
@@ -159,30 +162,32 @@ public class TrafficController implements Runnable{
 			while (true) {
 			    if (!p1Yellow.get() && lightsStatusP1.equals("Green")) {
 			        lightsStatusP1 = "Yellow";
+			        Logger.getInstance().log(phaseOneName + " changed lights to " + lightsStatusP1);
 			        notifyController();
 			    }
 			    if (!p1Red.get() && lightsStatusP1.equals("Yellow")) {
 			        lightsStatusP1 = "Red";
+			        Logger.getInstance().log(phaseOneName + " changed lights to " + lightsStatusP1);
 			        notifyController();
 			    }
 			    if (!p2Yellow.get() && lightsStatusP2.equals("Green")) {
 			        lightsStatusP2 = "Yellow";
+			        Logger.getInstance().log(phaseTwoName + " changed lights to " + lightsStatusP2);
 			        notifyController();
 			    }
 			    if (!p2Red.get() && lightsStatusP2.equals("Yellow")) {
 			        lightsStatusP2 = "Red";
+			        Logger.getInstance().log(phaseTwoName + " changed lights to " + lightsStatusP2);
 			        notifyController();
 			    }
 			    if (!p1Active.get() && !p1Notified) {
 			        p1Notified = true;
-			        System.out.println("Deactivate " + activePhaseOne);
 			        notifyVehicles(activePhaseOne);
 			        activePhaseOne = null;
 			        notifyController();
 			    }
 			    if (!p2Active.get() && !p2Notified) {
 			        p2Notified = true;
-			        System.out.println("Deactivate " + activePhaseTwo);
 			        notifyVehicles(activePhaseTwo);
 			        activePhaseTwo = null;
 			        notifyController();
@@ -203,7 +208,6 @@ public class TrafficController implements Runnable{
 	        schedulerp2yellow.shutdown();
 	        schedulerp1red.shutdown();
 	        schedulerp2red.shutdown();
-	        System.out.println("CHANGING SEGMENT");
 		}
 		
 		public void iterateSegments() {
@@ -217,6 +221,7 @@ public class TrafficController implements Runnable{
 		            e.printStackTrace();
 		        }
 				updateSegmentIndex();
+				Logger.getInstance().log("Segment switched to: " + String.valueOf(segmentIndex));
 				updateActivePhaseInfo();
 			}
 		}
@@ -250,6 +255,7 @@ public class TrafficController implements Runnable{
 
 		@Override
 		public void run() {
+			Logger.getInstance().log("Traffic simulation started");
 			iterateSegments();
 		}
 }

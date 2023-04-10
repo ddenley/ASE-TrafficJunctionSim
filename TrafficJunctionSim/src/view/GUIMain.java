@@ -40,7 +40,6 @@ public class GUIMain extends JFrame{
 	private JButton btnAddVehicle;
 	private JButton btnClearVehicleInput;
 	private JButton btnStart;
-	private JButton btnStop;
 	
 	private JPanel contentPane;
 	private JTable tableVehicles;
@@ -51,7 +50,6 @@ public class GUIMain extends JFrame{
 	private JTable tableActivePhases;
 	
 	private JLabel lblCO2PerMinute;
-	private JLabel lblCO2Estimate;
 
 	/**
 	 * Create the frame.
@@ -181,13 +179,9 @@ public class GUIMain extends JFrame{
 		lblCO2PerMinute.setBounds(10, 381, 338, 22);
 		contentPane.add(lblCO2PerMinute);
 		
-		lblCO2Estimate = new JLabel();
-		lblCO2Estimate.setFont(new Font("Verdana", Font.PLAIN, 13));
-		lblCO2Estimate.setBounds(10, 426, 359, 29);
-		contentPane.add(lblCO2Estimate);
-		
 		btnStart = new JButton("Start");
-		btnStart.setBounds(785, 597, 89, 23);
+		btnStart.setBackground(new Color(144, 238, 144));
+		btnStart.setBounds(822, 597, 103, 35);
 		contentPane.add(btnStart);
 		
 		JLabel lblActivePhases = new JLabel("Active Phases");
@@ -202,16 +196,10 @@ public class GUIMain extends JFrame{
 		tableActivePhases.setBounds(540, 391, 114, 121);
 		contentPane.add(tableActivePhases);
 		
-		btnStop = new JButton("Stop");
-		btnStop.setActionCommand("btnStart");
-		btnStop.setBounds(896, 597, 89, 23);
-		contentPane.add(btnStop);
-		
 		btnExit.setActionCommand("btnExit");
 		btnAddVehicle.setActionCommand("btnAddVehicle");
 		btnClearVehicleInput.setActionCommand("btnClearVehicleInput");
 		btnStart.setActionCommand("btnStart");
-		btnStop.setActionCommand("btnStop");
 		
 		
 	}
@@ -252,9 +240,6 @@ public class GUIMain extends JFrame{
 	public void setLblCO2PerMinute(String co2PerMin) {
 		lblCO2PerMinute.setText(co2PerMin);
 	}
-	public void setLblCO2Estimate(String co2Estimate) {
-		lblCO2Estimate.setText(co2Estimate);
-	}
 	public void setTableAddVehicleToEmpty() {
 		int i = 0;
 		while(i <= 7) {
@@ -275,9 +260,6 @@ public class GUIMain extends JFrame{
 	}
 	public void addBtnStartListener(ActionListener al) {
 		btnStart.addActionListener(al);
-	}
-	public void addBtnStopListener(ActionListener al) {
-		btnStop.addActionListener(al);
 	}
 	
 	
