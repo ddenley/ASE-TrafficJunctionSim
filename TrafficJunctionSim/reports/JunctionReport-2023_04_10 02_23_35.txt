@@ -1,0 +1,10 @@
+Traffic Junction Simulator Report || Dated: 2023/04/10 02:23:35
+Statistics Per Phase:
+Phase: 1	Vehicles crossed: 1	Emissions Produced: 12.00	Average Vehicle Wait Time: 0.00
+Phase: 2	Vehicles crossed: 0	Emissions Produced: 0.00	Average Vehicle Wait Time: 0.00
+Phase: 3	Vehicles crossed: 0	Emissions Produced: 0.00	Average Vehicle Wait Time: 0.00
+Phase: 4	Vehicles crossed: 0	Emissions Produced: 0.00	Average Vehicle Wait Time: 0.00
+Phase: 5	Vehicles crossed: 0	Emissions Produced: 0.00	Average Vehicle Wait Time: 0.00
+Phase: 6	Vehicles crossed: 1	Emissions Produced: 12.00	Average Vehicle Wait Time: 0.00
+Phase: 7	Vehicles crossed: 0	Emissions Produced: 0.00	Average Vehicle Wait Time: 0.00
+Phase: 8	Vehicles crossed: 0	Emissions Produced: 0.00	Average Vehicle Wait Time: 0.00

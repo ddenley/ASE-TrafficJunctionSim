@@ -16,13 +16,15 @@ import utility.Logger;
 import view.GUIMain;
 
 //Notifies main controller of changes
+//Upon an active phase being set that phases vehicles are notified
+//On notification vehicles are toggled from wait to running state
 
 public class TrafficController implements Runnable{
 		private GUIMainController controller;
 		
 		//Segments as linked list
 		private LinkedList<Object[][]> segments;
-		//Active phases
+		//Active phases variables
 		private String activePhaseOne;
 		private String phaseOneName;
 		private float activePhaseOneDuration;
@@ -35,6 +37,8 @@ public class TrafficController implements Runnable{
 		//TrafficController active boolean
 		private boolean trafficControllerActive;
 		
+		//https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ScheduledExecutorService.html#:~:text=An%20ExecutorService%20that%20can%20schedule,to%20cancel%20or%20check%20execution.
+		//An ExecutorService that can schedule commands to run after a given delay
 		ScheduledExecutorService schedulerp1;
 		ScheduledExecutorService schedulerp1yellow;
 		ScheduledExecutorService schedulerp1red;
@@ -42,6 +46,8 @@ public class TrafficController implements Runnable{
 		ScheduledExecutorService schedulerp2yellow;
 		ScheduledExecutorService schedulerp2red;
 		
+		//Light periods - yellow is signalled to notify upcoming red light
+		//Red light signifies a phase is inactive
 		private final long yellowLightsSeconds = 10;
 		private final long redLightsSeconds = 10;
 		private String lightsStatusP1;
@@ -102,6 +108,7 @@ public class TrafficController implements Runnable{
 			return segments;
 		}
 		
+		//Updates the active segment and loops through them - 4 segments
 		private void updateSegmentIndex() {
 			if (segmentIndex >= segments.size() -1) {
 				segmentIndex = 0;
@@ -111,6 +118,7 @@ public class TrafficController implements Runnable{
 			}
 		}
 		
+		//This looks at the segment and turns active the assoicated phases/lanes
 		private void updateActivePhaseInfo() {
 			Object[][] segment = segments.get(segmentIndex);
 			this.activePhaseOne = (String)segment[0][0];

@@ -23,9 +23,11 @@ import view.GUIMain;
 //Updates GUI
 //Recieves calls from  TrafficController
 public class GUIMainController {
+	//Models and views
 	private Phases phaseModel;
 	private Vehicles vehiclesModel;
 	private GUIMain view;
+	//Traffic controller calls main controller to update GUI
 	private TrafficController trafficController;
 	private boolean tControllerMade;
 	private Thread trafficControllerThread;
@@ -64,6 +66,7 @@ public class GUIMainController {
 	
 	
 	//Starts all vehicle threads - will be in wait state by default
+	//These threads will be notified and awoken by traffic controller
 	private void initVehiclesThreads() {
 		for(Vehicle vehicle : vehiclesModel.getVehiclesHashMap().values()) {
 			Thread vehicle_thread = new Thread(vehicle);

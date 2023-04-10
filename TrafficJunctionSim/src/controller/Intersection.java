@@ -3,7 +3,8 @@ package controller;
 import model.Vehicle;
 import utility.Logger;
 
-//This will be a shared resource and will have two instances - for each direction
+//Shared resource - one vehicle per active phase can enter at any time
+//Active phases are set within traffic controller
 public class Intersection {
 	
 	
