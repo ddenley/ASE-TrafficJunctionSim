@@ -25,20 +25,13 @@ public class Phases {
 	//List of observers for this model
 	private List <GUIMain> observers;
 	
-	
-	// Hash map will have phase string as ID and a phase object which holds a queue of vehicles
+	// Hash map will have phase string as ID and a phase object which holds a dobule ended queue of vehicleIDs and the phase duration
 	private HashMap<String, Phase> phasesHMap = new HashMap<String, Phase>();
-	//Collection of vehicle monitor objects for each vehicle
-	//private HashMap<String, Queue<Object>> phaseMonitorQueues = new HashMap<String, Queue<Object>>();
+	//Phase headers used for GUI
 	private String[] phaseHeaders;
 	
 	//Holds a reference to the vehicles object for population of its queues
-	//Also allows easier calculations for CO2 estimates which require phase duration and queue knowledge
 	private Vehicles vehicles;
-	
-	//TODO: THIS VARIABLE IS TO BE USED IN STAGE 2
-	//This variable holds a counter of how many cycles have occurred
-	private int cyclesOccured;
 	
 	//Phases constructor takes reference to vehicles for queue population
 	//Reference to init csv file for phase durations and names
@@ -59,11 +52,7 @@ public class Phases {
 		return this.phasesHMap;
 	}
 	
-//	public HashMap<String, Queue<Object>> getVehicleMonitorsQueue(){
-//		return this.phaseMonitorQueues;
-//	}
-	
-	//Method can throw an unhandled InvalidFileFormatException to ensure we do not enter a weird state
+	//Method can throw an unhandled InvalidFileFormatException to ensure we do not enter an unpredicted state
 	//Invalid files include if phase number is invalid
 	//Invalid phase paramaters throw from phase constructor and exit gracefully here
 	private void populateFromCSV(ArrayList<String[]> values) {
@@ -78,8 +67,6 @@ public class Phases {
 					Phase phase = new Phase(phase_duration);
 					//Add phase to hash map
 					this.phasesHMap.putIfAbsent(phase_name, phase);
-					//Add monitors
-					//phaseMonitorQueues.put(phase_name, new LinkedList<>());
 				}
 				catch (IllegalArgumentException ae) {
 					System.out.println(ae.getMessage());
@@ -92,12 +79,12 @@ public class Phases {
 		}
 	}
 	
-	//Sets instane header value used for GUI
+	//Sets instance header value used for GUI
 	private void setCSVHeader(String[] header) {
 		this.phaseHeaders = header;
 	}
 	
-	//Method uses vehicles refrence to populate each vehicle to relevant queue
+	//Method uses vehicles reference to populate each vehicle to relevant queue
 	//Relies on vehiclesPhaseAllocation method for inserting into correct queue
 	private void populatePhaseQueuesFromHashTable() {
 		for (Map.Entry<String, Vehicle> entry : this.vehicles.getVehiclesHashMap().entrySet())
@@ -117,8 +104,6 @@ public class Phases {
             String vehicleInfrontID = phase.getVehicleKeysQueue().peekLast();
             vehicle.setVehicleInfront(vehicles.getVehiclesHashMap().get(vehicleInfrontID));
             phase.addQueue(key);
-            Object vehicleMonitor = vehicle.getVehicleMonitor();
-            //phaseMonitorQueues.get(vehiclePhaseAllocation).add(vehicleMonitor);
         }
 	}
 	
@@ -177,14 +162,6 @@ public class Phases {
 			}
 		}
 		return phaseVehiclesArray;
-	}
-	
-	//CAN IGNORE DEBUG METHOD TO HELP VISUALISE QUEUE ALLOCATION
-	//This method was just to visualise how vehicles were populated into the queues - leaving for future debugging
-	private void quickPhaseQueueCheck() {
-		for (Phase phase : this.phasesHMap.values()) {
-			System.out.println(phase.getVehicleKeysQueue());
-		}
 	}
 	
 	private float[] getPhaseDurations() {
@@ -386,6 +363,8 @@ public class Phases {
 		}
 	}
 	
+	
+	//Check for if a vehicle is next in queue - if true it can enter intersection if not occupied
 	public synchronized boolean isVehicleNext(Vehicle vehicle) {
 		String phaseName = vehicle.getEightPhaseAllocation();
 		Phase phase = phasesHMap.get(phaseName);
@@ -395,6 +374,7 @@ public class Phases {
 		return phase.peekQueue().equals(vehicle.getVehicleID());
 	}
 	
+	//Remove vehicle from phase/lane
 	public synchronized void removeVehicle(Vehicle vehicle) {
         String phaseName = vehicle.getEightPhaseAllocation();
         Phase phase = phasesHMap.get(phaseName);
@@ -404,6 +384,8 @@ public class Phases {
         }
     }
 	
+	//Check for if a vehicle is last in the queue
+	//Used when calculating actual wait time of vehicles within vehicle class
 	public boolean checkLastInQueue(Vehicle vehicle) {
 		String phaseName = vehicle.getEightPhaseAllocation();
 		Deque<String> vehicleQueue = phasesHMap.get(phaseName).getVehicleKeysQueue();

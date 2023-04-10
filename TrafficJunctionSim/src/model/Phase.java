@@ -11,8 +11,8 @@ import java.util.Queue;
 public class Phase {
 	
 	//Phase object composed of a vehicle key queue and phase duration
-	//Accessed via getters
 	private float phaseDuration;
+	//Updated to double ended queue as vehicle threads when active need to check if they are last in their queue
 	private Deque<String> vehicleKeysQueue = new LinkedList<String>();
 	
 	//Constructor handles bad paramater input from files

@@ -28,21 +28,27 @@ public class Vehicle implements Runnable{
 	private final Intersection intersection;
 	
 	//Monitor object for thread communication and syncronization
+	//Example of monitor design pattern
+	//Using synchronized(vehicleMonitor) can ensure only one thread enters code
+	//section at a time - controlling access to shared resources
 	private final Object vehicleMonitor;
 	
+	//Boolean toggled on notification of vehicle
 	private final AtomicBoolean isActive = new AtomicBoolean(false);
 	
+	//Variables used to propogate distance moved of a vehicle down a queue
 	private AtomicBoolean vehicleMoved;
 	private Vehicle vehicleInfront;
 	private float distanceTravelled;
 	
+	//Variables used to produce accurate time taken for vehicle to enter intersection
 	private long timeEntered;
 	private long waitingTime;
 	
-	//TODO: These variables are for implementation in STAGE 2 can ignore
-	//This variable will hold how many cycles occurred before this vehicle crossed
+	//Used to approx how many cycles will occcur before crossing
 	private int cyclesBeforeCross;
 	//This variable holds how many vehicles passed before this one in the phase it crossed
+	//Used to approximate vehicle wait time in stage 1
 	private int phaseVehicleTurn;
 	
 	//Conscious decision to not use ENUMS here as was reducing code readability
@@ -346,12 +352,14 @@ public class Vehicle implements Runnable{
     }
 
 	
-	//NOTE: The run method below was implemented with the help of chat gpt
-	//I utilized this tool to help in understanding the syncronization for
-	//entering the intersection, the code is adapated and bug fixes implemented
-	//however for academic honesty I have included this note
+	//NOTE: Academic Honesty:
+	//Idea of using a monitor design pattern here came from chatgpt
+	//Code was adapted from generation from chatgpt which provided the monitor design
+	//Pattern as a way of toggling vehicle threads state
 	@Override
     public void run() {
+		//Time entered set - used to calcualte actual waiting time once
+		//vehicle enters intersection
 		setTimeEntered();
         while (true) {
             synchronized (vehicleMonitor) {
@@ -365,6 +373,7 @@ public class Vehicle implements Runnable{
             }
 
             while (isActive.get()) {
+            	//If vehicle is next allow it to attempt to enter intersection
                 if(phases.isVehicleNext(this)) {
                 	try {
                 		intersection.enterIntersection(this);
@@ -379,6 +388,8 @@ public class Vehicle implements Runnable{
                 	}
                 }
                 
+                //Code here allows for propogation of distance travelled for vehicles
+                //down the queue
                 synchronized (vehicleMonitor) {
                 	if(vehicleInfront != null && vehicleInfront.isVehicleMoved()) {
                     	vehicleInfront.setVehicleMoved(false);
