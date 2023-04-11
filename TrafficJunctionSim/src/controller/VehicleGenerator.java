@@ -130,6 +130,4 @@ public class VehicleGenerator implements Runnable{
 		}
 	}
 	
-	
-
 }

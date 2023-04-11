@@ -181,6 +181,7 @@ class VehicleTest {
 			Vehicle vehicle = new Vehicle("LLLLLL", "Car", "20", "Left", "g6", "5", "Crossed", "S1", this.intersection);
 		}
 		catch(IllegalArgumentException ae){
+			System.out.println(ae.getMessage());
 			assertTrue(ae.getMessage().equals("Invalid length - must be numeric: " + "g6"));
 		}
 	}

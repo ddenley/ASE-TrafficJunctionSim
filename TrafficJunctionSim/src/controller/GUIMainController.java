@@ -193,6 +193,8 @@ public class GUIMainController {
 				//Add vehicle to queue if in waiting state
 				if(vehicle.getStatus().equals("Waiting")) {
 					phaseModel.insertVehicleQueue(vehicle);
+					Thread vehicle_thread = new Thread(vehicle);
+					vehicle_thread.start();
 				}
 				Logger.getInstance().log(vehicle.getVehicleID() + " added via GUI");
 			}
