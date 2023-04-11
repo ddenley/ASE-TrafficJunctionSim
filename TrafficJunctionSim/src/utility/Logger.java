@@ -1,6 +1,7 @@
 package utility;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -54,7 +55,12 @@ public class Logger implements Runnable{
     	//changing "/" ":" characters so that it is a valid filename
     	filename = filename.replace("/", "_").replace(":", "_");
     	// save in directory logs
-    	filename = "logs/" + filename;
+    	String directory = "logs";
+    	File dir = new File(directory);
+    	if (!dir.exists()) {
+    		dir.mkdirs();
+    	}
+    	filename = directory + "/" + filename;
     	return filename;
     }
 
