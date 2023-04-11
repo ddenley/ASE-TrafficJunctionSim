@@ -62,6 +62,7 @@ public class Vehicles {
 				}
 			}
 			catch(IllegalArgumentException ae) {
+				System.out.println(ae.getMessage());
 				System.out.println("Invalid vehicle params in csv file: ignoring");
 			}
 		}

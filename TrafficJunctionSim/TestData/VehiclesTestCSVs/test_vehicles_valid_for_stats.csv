@@ -1,6 +1,6 @@
 Vehicle, Type, Crossing Time, Direction, Length, Emission, Status, Segment
 L23467,Car,10,Straight,5,12,Waiting,S1
 B24F67,Bus,6,Right,12,7,Waiting,S3
-GG3427,Bus,22,Straight,14,9,Waiting,S4
+GG3427,Bus,10,Straight,14,9,Waiting,S4
 FFFT34,Car,10,Left,5,12,Waiting,S1
 22FT34,Car,10,Left,5,12,Waiting,S2
